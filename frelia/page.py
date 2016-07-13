@@ -85,7 +85,7 @@ class PageRenderer:
     def render(self, page):
         dst = os.path.join(self.target_dir, page.path)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
-        rendered_content = self.document_renderer.render(self)
+        rendered_content = self.document_renderer.render(page.document)
         with open(dst, 'w') as file:
             file.write(rendered_content)
 

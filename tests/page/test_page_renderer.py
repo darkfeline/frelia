@@ -12,6 +12,7 @@ def test_render(tmpdir, document_renderer, page):
     renderer.render(page)
     rendered_file = tmpdir.join('dst/blog/page')
     assert rendered_file.read() == 'rendered content'
+    assert document_renderer.mock_calls == [mock.call.render(page.document)]
 
 
 @pytest.fixture
