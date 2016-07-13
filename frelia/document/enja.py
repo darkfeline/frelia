@@ -12,7 +12,7 @@ import io
 
 import yaml
 
-from . import base
+import frelia.document
 
 
 def read(file):
@@ -20,7 +20,7 @@ def read(file):
     metadata_stream, file = _create_metadata_stream(file)
     metadata = yaml.load(metadata_stream, Loader=yaml.CLoader)
     content = file.read()
-    return base.Document(metadata, content)
+    return frelia.document.Document(metadata, content)
 
 
 def write(document, file):
