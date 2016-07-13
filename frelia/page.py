@@ -85,6 +85,12 @@ class Page:
         self.document = document
         self.rendered_output = None
 
+    def __repr__(self):
+        return '{cls}({path!r}, {document!r})'.format(
+            cls=type(self).__name__,
+            path=self.path,
+            document=self.document)
+
 
 class PageWriter:
 
