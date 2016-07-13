@@ -1,24 +1,25 @@
 import io
 import textwrap
 
-from frelia import enja
+from frelia.document import base
+from frelia.document import enja
 
 
-def test_load():
+def test_read():
     """Test parsing a simple enja document from a file."""
     text = textwrap.dedent("""\
     foo: bar
     ---
     <p>Hello world!</p>""")
     file = io.StringIO(text)
-    doc = enja.EnjaDocument.load(file)
+    doc = enja.read(file)
     assert doc.metadata == {'foo': 'bar'}
     assert doc.content == '<p>Hello world!</p>'
 
 
-def test_dump():
+def test_write():
     """Test parsing a simple enja document from a file."""
     file = io.StringIO()
-    doc = enja.EnjaDocument({'foo': 'bar'}, '<p>Hello world!</p>')
-    doc.dump(file)
+    document = base.Document({'foo': 'bar'}, '<p>Hello world!</p>')
+    enja.write(document, file)
     assert file.getvalue() == 'foo: bar\n---\n<p>Hello world!</p>'

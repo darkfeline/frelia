@@ -29,14 +29,10 @@ import frelia.fs
 
 class PageLoader:
 
-    """Page loader.
+    """Page loader."""
 
-    document_class defines the class method load(file).
-
-    """
-
-    def __init__(self, document_class):
-        self.document_class = document_class
+    def __init__(self, document_reader):
+        self.document_reader = document_reader
 
     def load_pages(self, root):
         """Generate PageResource instances from a directory tree."""
@@ -47,7 +43,7 @@ class PageLoader:
         """Load a single page resource from the file system."""
         path = self._get_page_resource_path(filepath, root)
         with open(filepath) as file:
-            document = self.document_class.load(file)
+            document = self.document_reader(file)
         return Page(path, document)
 
     @classmethod
@@ -101,36 +97,3 @@ class PageRenderer:
         rendered_content = self.document_renderer.render(page.document)
         with open(dst, 'w') as file:
             file.write(rendered_content)
-
-
-class JinjaDocumentRenderer:
-
-    """Renders documents using Jinja.
-
-    Documents have the metadata and content attributes.
-
-    """
-
-    def __init__(self, env, default_template='base.html'):
-        self.env = env
-        self.default_template = default_template
-
-    def render(self, document):
-        """Render document."""
-        template = self._get_template(document)
-        context = self._get_context(document)
-        return template.render(context)
-
-    def _get_context(self, document):
-        """Get context for rendering document."""
-        context = document.metadata.copy()
-        context['content'] = document.content
-        return context
-
-    def _get_template(self, document):
-        """Get Jinja template for document."""
-        template_name = self._get_template_name(document)
-        return self.env.get_template(template_name)
-
-    def _get_template_name(self, document):
-        return document.metadata.get('template', self.default_template)

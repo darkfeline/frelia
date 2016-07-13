@@ -53,6 +53,6 @@ def test_strip_extension_path_nonhtml():
 
 @pytest.fixture
 def document_class(document):
-    cls = mock.NonCallableMock(['load'])
-    cls.load.return_value = document
+    cls = mock.Mock([])
+    cls.return_value = document
     return cls

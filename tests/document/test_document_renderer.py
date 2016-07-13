@@ -3,17 +3,17 @@ from unittest import mock
 import jinja2
 import pytest
 
-import frelia.page
+from frelia.document import renderers
 
 
 def test_render(env, template, document):
-    renderer = frelia.page.JinjaDocumentRenderer(env)
-    got = renderer.render(document)
+    renderer = renderers.JinjaDocumentRenderer(env)
+    got = renderer(document)
     assert got == mock.sentinel.output
 
 
 def test_get_template_name_default(env, document):
-    renderer = frelia.page.JinjaDocumentRenderer(
+    renderer = renderers.JinjaDocumentRenderer(
         env,
         default_template='base.html')
     got = renderer._get_template_name(document)
@@ -21,7 +21,7 @@ def test_get_template_name_default(env, document):
 
 
 def test_get_template_name_explicit(env, document):
-    renderer = frelia.page.JinjaDocumentRenderer(
+    renderer = renderers.JinjaDocumentRenderer(
         env,
         default_template='base.html')
     document.metadata['template'] = 'explicit.html'
@@ -30,7 +30,7 @@ def test_get_template_name_explicit(env, document):
 
 
 def test_get_context(env, document):
-    renderer = frelia.page.JinjaDocumentRenderer(env)
+    renderer = renderers.JinjaDocumentRenderer(env)
     got = renderer._get_context(document)
     assert got == {
         'sophie': 'prachta',
@@ -39,7 +39,7 @@ def test_get_context(env, document):
 
 
 def test_get_template(env, template, document):
-    renderer = frelia.page.JinjaDocumentRenderer(env)
+    renderer = renderers.JinjaDocumentRenderer(env)
     document.metadata['template'] = 'explicit.html'
     got = renderer._get_template(document)
     assert got is template
