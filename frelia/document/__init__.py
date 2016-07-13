@@ -12,7 +12,7 @@ class Document:
         self.content = content
 
     def __repr__(self):
-        return '{cls}({metadata!r}, {content!r})'.format(
+        return '<{cls} at 0x{id:x} with metadata {metadata!r}>'.format(
             cls=type(self).__name__,
-            metadata=self.metadata,
-            content=self.content)
+            id=id(self),
+            metadata=self.metadata)
