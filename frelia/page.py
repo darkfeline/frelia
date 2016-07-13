@@ -50,12 +50,25 @@ class PageLoader:
             document = self.document_class.load(file)
         return Page(path, document)
 
-    @staticmethod
-    def _get_page_resource_path(filepath, root=os.curdir):
+    @classmethod
+    def _get_page_resource_path(cls, filepath, root=os.curdir):
         """Get path of page resource loaded from file."""
         relpath = os.path.relpath(filepath, root)
+        return cls._strip_extension(relpath)
+
+    @staticmethod
+    def _strip_extension(relpath):
+        """Maybe strip extension from page path.
+
+        HTML resources that are not index.html will be stripped.
+
+        """
         base, ext = os.path.splitext(relpath)
-        if ext.lower() == '.html':
+        strip = (
+            ext == '.html'
+            and os.path.basename(relpath) != 'index.html'
+        )
+        if strip:
             return base
         else:
             return relpath
