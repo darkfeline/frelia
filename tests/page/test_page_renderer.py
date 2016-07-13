@@ -22,6 +22,6 @@ def page(document):
 
 @pytest.fixture
 def document_renderer():
-    renderer = mock.NonCallableMock(['render'])
-    renderer.render.return_value = 'rendered content'
+    renderer = mock.Mock([])
+    renderer.return_value = 'rendered content'
     return renderer
