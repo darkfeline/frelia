@@ -76,24 +76,40 @@ class Page:
 
     Contains the page itself and the path where the page would be built.
 
+    The rendered_output attribute caches the rendered form of the page's document.
+
     """
 
     def __init__(self, path, document):
         self.path = path
         self.document = document
+        self.rendered_output = None
+
+
+class PageWriter:
+
+    """Contains logic for writing rendered pages."""
+
+    def __init__(self, target_dir):
+        self.target_dir = target_dir
+
+    def __call__(self, page):
+        if page.rendered_output is None:
+            return
+        dst = os.path.join(self.target_dir, page.path)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        with open(dst, 'w') as file:
+            file.write(page.rendered_output)
 
 
 class PageRenderer:
 
     """Contains logic for rendering pages."""
 
-    def __init__(self, document_renderer, target_dir):
+    def __init__(self, document_renderer):
         self.document_renderer = document_renderer
-        self.target_dir = target_dir
 
-    def render(self, page):
-        dst = os.path.join(self.target_dir, page.path)
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        rendered_content = self.document_renderer(page.document)
-        with open(dst, 'w') as file:
-            file.write(rendered_content)
+    def __call__(self, page):
+        rendered_output = self.document_renderer(page.document)
+        page.rendered_output = rendered_output
+        return rendered_output
