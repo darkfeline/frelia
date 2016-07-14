@@ -1,4 +1,4 @@
-"""Custom Jinja environment for frelia."""
+"""Custom Jinja Environments."""
 
 import jinja2
 
@@ -7,12 +7,13 @@ import frelia.filters
 
 class Environment(jinja2.Environment):
 
-    """Custom Jinja environment for frelia."""
+    """Jinja Environment with better defaults."""
 
     __DEFAULT_OPTIONS = {
         'trim_blocks': True,
         'lstrip_blocks': True,
         'auto_reload': False,
+        'loader': jinja2.PackageLoader('frelia', 'templates'),
     }
 
     def __init__(self, **options):

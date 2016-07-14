@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  {% for url in urls %}
+  <url>
+    <loc>{{ url.loc|e }}</loc>
+    {% if url.lastmod is not none %}
+    <lastmod>{{ url.lastmod|e }}</lastmod>
+    {% endif %}
+    {% if url.changefreq is not none %}
+    <changefreq>{{ url.changefreq|e }}</changefreq>
+    {% endif %}
+    {% if url.priority is not none %}
+    <priority>{{ url.priority|e }}</priority>
+    {% endif %}
+  </url>
+  {% endfor %}
+</urlset>
