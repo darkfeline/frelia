@@ -18,10 +18,10 @@ class RenderJinja:
         self.env = env
 
     def __call__(self, documents):
-        env = self.env
+        template_from_string = self.env.from_string
         for document in documents:
             logger.debug('Rendering document content for %r...', document)
-            content_as_template = env.from_string(document.content)
+            content_as_template = template_from_string(document.content)
             rendered_content = content_as_template.render(document.metadata)
             document.content = rendered_content
 
@@ -35,8 +35,8 @@ class SetDefaultMetadata:
         self.defaults = defaults
 
     def __call__(self, documents):
-        defaults = self.defaults
+        make_copy = self.defaults.copy
         for document in documents:
-            new_metadata = defaults.copy()
+            new_metadata = make_copy()
             new_metadata.update(document.metadata)
             document.metadata = new_metadata
