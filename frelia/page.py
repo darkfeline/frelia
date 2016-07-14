@@ -36,38 +36,11 @@ class PageLoader:
 
     def load_pages(self, root):
         """Generate PageResource instances from a directory tree."""
+        document_reader = self.document_reader
         for filepath in frelia.fs.walk_files(root):
-            yield self.load_page(filepath, root)
-
-    def load_page(self, filepath, root=os.curdir):
-        """Load a single page resource from the file system."""
-        path = self._get_page_resource_path(filepath, root)
-        with open(filepath) as file:
-            document = self.document_reader(file)
-        return Page(path, document)
-
-    @classmethod
-    def _get_page_resource_path(cls, filepath, root=os.curdir):
-        """Get path of page resource loaded from file."""
-        relpath = os.path.relpath(filepath, root)
-        return cls._strip_extension(relpath)
-
-    @staticmethod
-    def _strip_extension(relpath):
-        """Maybe strip extension from page path.
-
-        HTML resources that are not index.html will be stripped.
-
-        """
-        base, ext = os.path.splitext(relpath)
-        strip = (
-            ext == '.html'
-            and os.path.basename(relpath) != 'index.html'
-        )
-        if strip:
-            return base
-        else:
-            return relpath
+            with open(filepath) as file:
+                document = document_reader(file)
+            yield Page(filepath, document)
 
 
 class Page:
@@ -99,13 +72,15 @@ class PageWriter:
     def __init__(self, target_dir):
         self.target_dir = target_dir
 
-    def __call__(self, page):
-        if page.rendered_output is None:
-            return
-        dst = os.path.join(self.target_dir, page.path)
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        with open(dst, 'w') as file:
-            file.write(page.rendered_output)
+    def __call__(self, pages):
+        target_dir = self.target_dir
+        for page in pages:
+            if page.rendered_output is None:
+                continue
+            dst = os.path.join(target_dir, page.path)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with open(dst, 'w') as file:
+                file.write(page.rendered_output)
 
 
 class PageRenderer:
@@ -115,7 +90,8 @@ class PageRenderer:
     def __init__(self, document_renderer):
         self.document_renderer = document_renderer
 
-    def __call__(self, page):
-        rendered_output = self.document_renderer(page.document)
-        page.rendered_output = rendered_output
-        return rendered_output
+    def __call__(self, pages):
+        document_renderer = self.document_renderer
+        for page in pages:
+            rendered_output = document_renderer(page.document)
+            page.rendered_output = rendered_output
