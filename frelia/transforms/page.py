@@ -1,6 +1,10 @@
 """Page transformations."""
 
-import os.path
+import datetime
+import itertools
+import os
+
+import frelia.fs
 
 
 class DocumentPageTransform:
@@ -41,3 +45,28 @@ def strip_page_extension(pages):
         )
         if strip:
             page.path = base
+
+
+class DateFromPath:
+
+    """Set metadata date from page path."""
+
+    def __init__(self, fieldname):
+        self.fieldname = fieldname
+
+    def __call__(self, pages):
+        fieldname = self.fieldname
+        for page in pages:
+            metadata = page.document.metadata
+            if fieldname not in metadata:
+                path = os.path.dirname(page.path)
+                filenames = frelia.fs.path_filenames(path)
+                day, month, year = itertools.islice(filenames, 3)
+                metadata[fieldname] = self._parse_date(year, month, day)
+
+    @staticmethod
+    def _parse_date(year, month, day):
+        try:
+            return datetime.date(int(year), int(month), int(day))
+        except ValueError:
+            return None
