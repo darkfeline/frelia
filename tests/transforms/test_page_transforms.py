@@ -60,7 +60,7 @@ def test_date_from_path_too_short(page):
     transform = page_transforms.DateFromPath('published')
     assert 'published' not in page.document.metadata
     transform([page])
-    assert page.document.metadata['published'] == None
+    assert 'published' not in page.document.metadata
 
 
 def test_date_from_path_out_of_range(page):
@@ -68,7 +68,7 @@ def test_date_from_path_out_of_range(page):
     transform = page_transforms.DateFromPath('published')
     assert 'published' not in page.document.metadata
     transform([page])
-    assert page.document.metadata['published'] == None
+    assert 'published' not in page.document.metadata
 
 
 def test_date_from_path_non_number(page):
@@ -76,4 +76,4 @@ def test_date_from_path_non_number(page):
     transform = page_transforms.DateFromPath('published')
     assert 'published' not in page.document.metadata
     transform([page])
-    assert page.document.metadata['published'] == None
+    assert 'published' not in page.document.metadata

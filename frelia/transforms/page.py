@@ -2,9 +2,12 @@
 
 import datetime
 import itertools
+import logging
 import os
 
 import frelia.fs
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentPageTransforms:
@@ -51,7 +54,12 @@ def strip_page_extension(pages):
 
 class DateFromPath:
 
-    """Set metadata date from page path."""
+    """Set metadata date from page path.
+
+    Attempt to set the given metadata field, if missing, to a date parsed from
+    the page path.
+
+    """
 
     def __init__(self, fieldname):
         self.fieldname = fieldname
@@ -61,14 +69,15 @@ class DateFromPath:
         for page in pages:
             metadata = page.document.metadata
             if fieldname not in metadata:
-                metadata[fieldname] = self._parse_date_from_path(page.path)
+                try:
+                    metadata[fieldname] = self._parse_date(page.path)
+                except ValueError as e:
+                    logger.warning('Could not parse date for %r: %s', page, e)
 
-    def _parse_date_from_path(self, path):
+    @staticmethod
+    def _parse_date(path):
         path = os.path.dirname(path)
         filenames = frelia.fs.path_filenames(path)
         parts = tuple(itertools.islice(filenames, 3))
-        try:
-            day, month, year = parts
-            return datetime.date(int(year), int(month), int(day))
-        except ValueError:
-            return None
+        day, month, year = parts
+        return datetime.date(int(year), int(month), int(day))
