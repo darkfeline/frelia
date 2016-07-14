@@ -16,7 +16,7 @@ setup(
 
     author='Allen Li',
     author_email='darkfeline@felesatra.moe',
-    description='Static site generator library',
+    description='Static website generator library',
     license='',
     url='',
 )
