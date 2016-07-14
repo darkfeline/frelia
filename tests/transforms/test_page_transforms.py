@@ -5,10 +5,10 @@ import frelia.page
 import frelia.transforms.page as page_transforms
 
 
-def test_document_page_transform(document):
+def test_document_page_transforms(document):
     page = frelia.page.Page('foo', document)
     document_func = mock.Mock()
-    page_func = page_transforms.DocumentPageTransform(document_func)
+    page_func = page_transforms.DocumentPageTransforms([document_func])
     page_func([page])
     positional_args = document_func.call_args[0]
     assert list(positional_args[0]) == [document]

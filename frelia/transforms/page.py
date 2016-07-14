@@ -7,15 +7,17 @@ import os
 import frelia.fs
 
 
-class DocumentPageTransform:
+class DocumentPageTransforms:
 
-    """Maps a document transformation to a page transformation."""
+    """Maps document transformations to page transformations."""
 
-    def __init__(self, transform):
-        self.transform = transform
+    def __init__(self, transforms):
+        self.transforms = list(transforms)
 
     def __call__(self, pages):
-        self.transform(page.document for page in pages)
+        documents = [page.document for page in pages]
+        for transform in self.transforms:
+            transform(documents)
 
 
 class RebasePagePath:
