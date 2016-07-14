@@ -19,6 +19,7 @@ def test_render_jinja(env, template, document):
     assert document.content != 'rendered template'
     render([document])
     assert document.content == 'rendered template'
+    assert template.mock_calls == [mock.call.render(document.metadata)]
 
 
 def test_document_page_transform(document):
