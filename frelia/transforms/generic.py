@@ -1,6 +1,6 @@
-class TransformGroup:
+class ComposeTransforms:
 
-    """Group transformation functions."""
+    """Compose transformation functions."""
 
     def __init__(self, transforms=()):
         self.transforms = list(transforms)
