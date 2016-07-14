@@ -1,6 +1,6 @@
 """Enja documents.
 
-This module implements enja documents.
+This module implements reading and writing the enja file format.
 
 An enja document file is a text file that contains YAML formatted metadata
 separated from the succeeding document content by a line containing three

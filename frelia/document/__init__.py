@@ -1,9 +1,10 @@
 class Document:
 
-    """Documents with metadata.
+    """Document with metadata.
 
-    Documents have structured metadata and a content body, both of an
-    unspecified format.
+    A document has structured metadata and a content body, both in an
+    unspecified format.  Basically, a document represents a UNIX file (a bag of
+    bytes, or Unicode text in this case), but with metadata.
 
     """
 

@@ -1,6 +1,6 @@
 """Document renderers.
 
-Document renderers are callables that take a document object and returns some
+Document renderers are callables that take a document object and return some
 kind of rendered output.
 
 """
@@ -8,11 +8,7 @@ kind of rendered output.
 
 class JinjaDocumentRenderer:
 
-    """Render documents using Jinja.
-
-    Documents have the metadata and content attributes.
-
-    """
+    """Render documents using Jinja."""
 
     def __init__(self, env, default_template='base.html'):
         self.env = env
