@@ -59,14 +59,15 @@ class DateFromPath:
         for page in pages:
             metadata = page.document.metadata
             if fieldname not in metadata:
-                path = os.path.dirname(page.path)
-                filenames = frelia.fs.path_filenames(path)
-                day, month, year = itertools.islice(filenames, 3)
-                metadata[fieldname] = self._parse_date(year, month, day)
+                metadata[fieldname] = self._parse_date_from_path(page.path)
 
     @staticmethod
-    def _parse_date(year, month, day):
+    def _parse_date_from_path(path):
+        path = os.path.dirname(path)
+        filenames = frelia.fs.path_filenames(path)
+        parts = tuple(itertools.islice(filenames, 3))
         try:
+            day, month, year = parts
             return datetime.date(int(year), int(month), int(day))
         except ValueError:
             return None
