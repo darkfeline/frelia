@@ -1,6 +1,7 @@
 """Custom Jinja filters."""
 
 import html
+import itertools
 import urllib.parse
 
 __all__ = [
@@ -34,8 +35,4 @@ def _tagattr(obj, attr):
 
 def first(obj, n):
     """Get the first n items."""
-    i = 0
-    obj = iter(obj)
-    while i < n:
-        yield next(obj)
-        i += 1
+    yield from itertools.islice(obj, n)
