@@ -42,13 +42,3 @@ def test_link_files(dirtree):
     frelia.fs.link_files(str(src), str(dst))
     assert _samefile('foo/baz', src, dst)
     assert _samefile('spam/bacon', src, dst)
-
-
-def test_filter_ext():
-    files = [
-        'page.html',
-        'page2.HTML',
-        'script.js',
-    ]
-    got = list(frelia.fs.filter_ext(files, '.html'))
-    assert got == ['page.html']
