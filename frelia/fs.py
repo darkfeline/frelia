@@ -17,3 +17,14 @@ def link_files(src, dst):
         dst_path = os.path.join(dst, rel_path)
         os.makedirs(os.path.dirname(dst_path), exist_ok=True)
         os.link(src_path, dst_path)
+
+
+def path_filenames(path):
+    """Split a path and yield its filenames."""
+    while path:
+        path, filename = os.path.split(path)
+        if filename:
+            yield filename
+        else:
+            yield path
+            break
