@@ -51,8 +51,9 @@ class DateFromPath:
 
     """Set metadata date from page path."""
 
-    def __init__(self, fieldname):
+    def __init__(self, fieldname, default=None):
         self.fieldname = fieldname
+        self.default = default
 
     def __call__(self, pages):
         fieldname = self.fieldname
@@ -61,8 +62,7 @@ class DateFromPath:
             if fieldname not in metadata:
                 metadata[fieldname] = self._parse_date_from_path(page.path)
 
-    @staticmethod
-    def _parse_date_from_path(path):
+    def _parse_date_from_path(self, path):
         path = os.path.dirname(path)
         filenames = frelia.fs.path_filenames(path)
         parts = tuple(itertools.islice(filenames, 3))
@@ -70,4 +70,4 @@ class DateFromPath:
             day, month, year = parts
             return datetime.date(int(year), int(month), int(day))
         except ValueError:
-            return None
+            return self.default

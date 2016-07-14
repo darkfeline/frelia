@@ -42,50 +42,48 @@ def test_strip_page_extension_path_nonhtml(page):
 def test_date_from_path(page):
     page.path = 'blog/2010/01/02/post'
     transform = page_transforms.DateFromPath('published')
-    assert page.document.metadata == {'sophie': 'prachta'}
+    assert 'published' not in page.document.metadata
     transform([page])
-    assert page.document.metadata == {
-        'sophie': 'prachta',
-        'published': datetime.date(2010, 1, 2),
-    }
+    assert page.document.metadata['published'] == datetime.date(2010, 1, 2)
 
 
 def test_date_from_path_with_existing_value(page):
     page.path = 'blog/2010/01/02/post'
-    page.document.metadata = {'published': 1}
+    page.document.metadata['published'] = 1
     transform = page_transforms.DateFromPath('published')
     transform([page])
-    assert page.document.metadata == {'published': 1}
+    assert page.document.metadata['published'] == 1
 
 
 def test_date_from_path_too_short(page):
     page.path = 'blog/post'
     transform = page_transforms.DateFromPath('published')
-    assert page.document.metadata == {'sophie': 'prachta'}
+    assert 'published' not in page.document.metadata
     transform([page])
-    assert page.document.metadata == {
-        'sophie': 'prachta',
-        'published': None,
-    }
+    assert page.document.metadata['published'] == None
 
 
 def test_date_from_path_out_of_range(page):
     page.path = 'blog/2010/13/02/post'
     transform = page_transforms.DateFromPath('published')
-    assert page.document.metadata == {'sophie': 'prachta'}
+    assert 'published' not in page.document.metadata
     transform([page])
-    assert page.document.metadata == {
-        'sophie': 'prachta',
-        'published': None,
-    }
+    assert page.document.metadata['published'] == None
 
 
 def test_date_from_path_non_number(page):
     page.path = 'blog/2010/01/tag/post'
     transform = page_transforms.DateFromPath('published')
-    assert page.document.metadata == {'sophie': 'prachta'}
+    assert 'published' not in page.document.metadata
     transform([page])
-    assert page.document.metadata == {
-        'sophie': 'prachta',
-        'published': None,
-    }
+    assert page.document.metadata['published'] == None
+
+
+def test_date_from_path_default(page):
+    page.path = 'blog/post'
+    transform = page_transforms.DateFromPath(
+        'published',
+        default=datetime.date(2010, 1, 2))
+    assert 'published' not in page.document.metadata
+    transform([page])
+    assert page.document.metadata['published'] == datetime.date(2010, 1, 2)
