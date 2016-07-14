@@ -77,13 +77,3 @@ def test_date_from_path_non_number(page):
     assert 'published' not in page.document.metadata
     transform([page])
     assert page.document.metadata['published'] == None
-
-
-def test_date_from_path_default(page):
-    page.path = 'blog/post'
-    transform = page_transforms.DateFromPath(
-        'published',
-        default=datetime.date(2010, 1, 2))
-    assert 'published' not in page.document.metadata
-    transform([page])
-    assert page.document.metadata['published'] == datetime.date(2010, 1, 2)

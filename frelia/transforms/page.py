@@ -53,9 +53,8 @@ class DateFromPath:
 
     """Set metadata date from page path."""
 
-    def __init__(self, fieldname, default=None):
+    def __init__(self, fieldname):
         self.fieldname = fieldname
-        self.default = default
 
     def __call__(self, pages):
         fieldname = self.fieldname
@@ -72,4 +71,4 @@ class DateFromPath:
             day, month, year = parts
             return datetime.date(int(year), int(month), int(day))
         except ValueError:
-            return self.default
+            return None
