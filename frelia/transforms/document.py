@@ -1,5 +1,9 @@
 """Document transformations."""
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class RenderJinja:
 
@@ -16,6 +20,7 @@ class RenderJinja:
     def __call__(self, documents):
         env = self.env
         for document in documents:
+            logger.debug('Rendering document content for %r...', document)
             content_as_template = env.from_string(document.content)
             rendered_content = content_as_template.render(document.metadata)
             document.content = rendered_content

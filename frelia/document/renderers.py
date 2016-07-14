@@ -5,6 +5,10 @@ kind of rendered output.
 
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class JinjaDocumentRenderer:
 
@@ -16,6 +20,7 @@ class JinjaDocumentRenderer:
 
     def __call__(self, document):
         """Render document."""
+        logger.debug('Rendering document %r...', document)
         template = self._get_template(document)
         context = self._get_context(document)
         return template.render(context)
