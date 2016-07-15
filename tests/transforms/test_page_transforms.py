@@ -21,19 +21,25 @@ def test_rebase_page_path(page):
     assert page.path == 'blog/post'
 
 
-def test_strip_page_extension_path_html(page):
+def test_strip_page_extension_html(page):
     page.path = 'blog/post.html'
     page_transforms.strip_page_extension([page])
     assert page.path == 'blog/post'
 
 
-def test_strip_page_extension_path_index_html(page):
+def test_strip_page_extension_index_html(page):
     page.path = 'blog/index.html'
     page_transforms.strip_page_extension([page])
     assert page.path == 'blog/index.html'
 
 
-def test_strip_page_extension_path_nonhtml(page):
+def test_strip_page_extension_404(page):
+    page.path = '404.html'
+    page_transforms.strip_page_extension([page])
+    assert page.path == '404.html'
+
+
+def test_strip_page_extension_nonhtml(page):
     page.path = 'static/style.css'
     page_transforms.strip_page_extension([page])
     assert page.path == 'static/style.css'
