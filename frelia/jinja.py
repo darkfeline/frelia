@@ -14,6 +14,7 @@ class Environment(jinja2.Environment):
         'lstrip_blocks': True,
         'auto_reload': False,
         'loader': jinja2.PackageLoader('frelia', 'templates'),
+        'bytecode_cache': jinja2.FileSystemBytecodeCache(),
     }
 
     def __init__(self, **options):
