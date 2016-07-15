@@ -40,3 +40,21 @@ class SetDefaultMetadata:
             new_metadata = make_copy()
             new_metadata.update(document.metadata)
             document.metadata = new_metadata
+
+
+class CopyMetadata:
+
+    """Set missing metadata field with other metadata field."""
+
+    def __init__(self, from_field, to_field):
+        self.from_field = from_field
+        self.to_field = to_field
+
+    def __call__(self, documents):
+        """Set index using aggregate."""
+        from_field = self.from_field
+        to_field = self.to_field
+        for document in documents:
+            metadata = document.metadata
+            if to_field not in metadata and from_field in metadata:
+                metadata[to_field] = metadata[from_field]

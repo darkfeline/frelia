@@ -16,3 +16,17 @@ def test_set_default_metadata(document):
     assert document.metadata == {'sophie': 'prachta'}
     transform([document])
     assert document.metadata == {'sophie': 'prachta', 'firis': 'liane'}
+
+
+def test_copy_metadata(document):
+    transform = document_transforms.CopyMetadata('sophie', 'firis')
+    assert document.metadata == {'sophie': 'prachta'}
+    transform([document])
+    assert document.metadata == {'sophie': 'prachta', 'firis': 'prachta'}
+
+
+def test_copy_metadata_with_existing_value(document):
+    transform = document_transforms.CopyMetadata('sophie', 'firis')
+    document.metadata = {'sophie': 'prachta', 'firis': 'liane'}
+    transform([document])
+    assert document.metadata == {'sophie': 'prachta', 'firis': 'liane'}
