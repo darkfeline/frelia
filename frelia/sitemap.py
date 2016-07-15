@@ -57,7 +57,11 @@ class URL:
 
 
 def render(urls):
-    """Render sitemap.xml content using provided URLs."""
+    """Render sitemap.xml content using provided URLs.
+
+    urls is an iterable.
+
+    """
     context = {'urls': urls}
     env = frelia.jinja.Environment()
     template = env.get_template('sitemap.xml')

@@ -40,3 +40,20 @@ def test_render(url):
     <priority>0.7</priority>
   </url>
 </urlset>"""
+
+
+def test_render_iterable(url):
+    got = sitemap.render((x for x in [url]))
+    assert got == """\
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <url>
+    <loc>http://localhost/</loc>
+    <lastmod>2010-01-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>"""
