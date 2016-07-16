@@ -1,4 +1,8 @@
-"""Sitemaps."""
+"""Sitemaps.
+
+http://www.sitemaps.org/protocol.html
+
+"""
 
 import datetime
 import numbers
