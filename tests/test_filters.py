@@ -25,8 +25,9 @@ def test_tagattrs():
         [],
         foo='bar',
         spam='eggs"',
-        cloche='pastalie')
-    got = filters.tagattrs(obj, 'spam', 'foo')
+        cloche='pastalie',
+        none=None)
+    got = filters.tagattrs(obj, 'spam', 'foo', 'none')
     assert got == 'spam="eggs&quot;" foo="bar"'
 
 

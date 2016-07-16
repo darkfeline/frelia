@@ -23,7 +23,10 @@ def tagattrs(obj, *attrs):
     attribute if the object has the attribute, for each given attribute.
 
     """
-    return ' '.join(_tagattr(obj, attr) for attr in attrs)
+    return ' '.join(
+        _tagattr(obj, attr)
+        for attr in attrs
+        if getattr(obj, attr, None) is not None)
 
 
 def _tagattr(obj, attr):
