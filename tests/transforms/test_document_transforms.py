@@ -5,9 +5,9 @@ import frelia.transforms.document as document_transforms
 
 def test_render_template(document):
     render = document_transforms.RenderTemplate({'ion': 'earthes'})
-    document.content = 'hello $ion'
+    document.content = 'hello $ion $sophie'
     render([document])
-    assert document.content == 'hello earthes'
+    assert document.content == 'hello earthes prachta'
 
 
 def test_render_jinja(env, template, document):

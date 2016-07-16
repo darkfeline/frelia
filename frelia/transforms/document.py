@@ -18,9 +18,12 @@ class RenderTemplate:
         self.mapping = mapping
 
     def __call__(self, documents):
+        copy = self.mapping.copy
         for document in documents:
+            mapping = copy()
+            mapping.update(document.metadata)
             template = string.Template(document.content)
-            document.content = template.safe_substitute(self.mapping)
+            document.content = template.safe_substitute(mapping)
 
 
 class RenderJinja:
