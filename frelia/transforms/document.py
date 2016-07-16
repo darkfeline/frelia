@@ -1,8 +1,26 @@
 """Document transformations."""
 
 import logging
+import string
 
 logger = logging.getLogger(__name__)
+
+
+class RenderTemplate:
+
+    """Document transform that renders document content using Python templates.
+
+    This is faster than RenderJinja.
+
+    """
+
+    def __init__(self, mapping):
+        self.mapping = mapping
+
+    def __call__(self, documents):
+        for document in documents:
+            template = string.Template(document.content)
+            document.content = template.safe_substitute(self.mapping)
 
 
 class RenderJinja:
@@ -11,6 +29,8 @@ class RenderJinja:
 
     This renders the document content as a Jinja template.  This allows the use
     of Jinja macros in the document, for example.
+
+    This is extremely slow.
 
     """
 
