@@ -32,7 +32,7 @@
     <title>{{ entry.title }}</title>
     <updated>{{ entry.updated.isoformat() }}</updated>
     {% if entry.summary is not none %}
-    <summary>{{ entry.summary }}</summary>
+    <summary type="html">{{ entry.summary|e }}</summary>
     {% endif %}
     {% if entry.published is not none %}
     <published>{{ entry.published }}</published>
