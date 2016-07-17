@@ -36,24 +36,27 @@ class RebasePagePath:
             page.path = os.path.relpath(page.path, basepath)
 
 
-def strip_page_extension(pages):
+class StripExtensions:
+
     """Conditionally strip page path filename extension.
 
     HTML resources will have their extensions stripped, except "special" files
     like index.html or 404.html.
 
     """
-    splitext = os.path.splitext
-    basename = os.path.basename
-    special = {'index.html', '404.html'}
-    for page in pages:
-        base, ext = splitext(page.path)
-        strip = (
-            ext == '.html'
-            and basename(page.path) not in special
-        )
-        if strip:
-            page.path = base
+
+    def __call__(self, pages):
+        splitext = os.path.splitext
+        basename = os.path.basename
+        special = {'index.html', '404.html'}
+        for page in pages:
+            base, ext = splitext(page.path)
+            strip = (
+                ext == '.html'
+                and basename(page.path) not in special
+            )
+            if strip:
+                page.path = base
 
 
 class DateFromPath:
