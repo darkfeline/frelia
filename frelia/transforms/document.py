@@ -27,18 +27,15 @@ class RenderTemplate:
 
     @classmethod
     def _flatten_mapping(cls, mapping, prefix=''):
-        """Flatten a mapping for rendering templates.
-
-        Modifies mapping in place and returns it.
-
-        """
+        """Flatten a mapping for rendering templates."""
+        new_mapping = {}
         for key, value in list(mapping.items()):
             if isinstance(value, dict):
-                mapping.pop(key)
-                cls._flatten_mapping(value, prefix + '_' + key if prefix else key)
+                value = cls._flatten_mapping(value, prefix + '_' + key if prefix else key)
+                new_mapping.update(value)
             else:
-                mapping[prefix + '_' + key if prefix else key] = value
-        return mapping
+                new_mapping[prefix + '_' + key if prefix else key] = value
+        return new_mapping
 
 
 class RenderJinja:
