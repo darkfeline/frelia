@@ -2,18 +2,11 @@
 
 import html
 import itertools
-import urllib.parse
 
 __all__ = [
-    'urljoin',
     'tagattrs',
     'first',
 ]
-
-
-def urljoin(url, base):
-    """urljoin filter"""
-    return urllib.parse.urljoin(base, url)
 
 
 def tagattrs(obj, *attrs):
