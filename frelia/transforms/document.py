@@ -15,7 +15,7 @@ class RenderTemplate:
     """
 
     def __init__(self, mapping):
-        self.mapping = mapping
+        self.mapping = self._flatten_mapping(mapping)
 
     def __call__(self, documents):
         copy = self.mapping.copy
@@ -24,6 +24,21 @@ class RenderTemplate:
             mapping.update(document.metadata)
             template = string.Template(document.content)
             document.content = template.safe_substitute(mapping)
+
+    @classmethod
+    def _flatten_mapping(cls, mapping, prefix=''):
+        """Flatten a mapping for rendering templates.
+
+        Modifies mapping in place and returns it.
+
+        """
+        for key, value in list(mapping.items()):
+            if isinstance(value, dict):
+                mapping.pop(key)
+                cls._flatten_mapping(value, prefix + '_' + key if prefix else key)
+            else:
+                mapping[prefix + '_' + key if prefix else key] = value
+        return mapping
 
 
 class RenderJinja:

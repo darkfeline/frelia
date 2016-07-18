@@ -10,6 +10,13 @@ def test_render_template(document):
     assert document.content == 'hello earthes prachta'
 
 
+def test_render_template_flatten_mapping():
+    got = document_transforms.RenderTemplate._flatten_mapping({
+        'foo': {'bar': 'baz'}
+    })
+    assert got == {'foo_bar': 'baz'}
+
+
 def test_render_jinja(env, template, document):
     render = document_transforms.RenderJinja(env)
     assert document.content != 'rendered template'
