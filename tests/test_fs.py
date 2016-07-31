@@ -44,11 +44,11 @@ def test_link_files(dirtree):
     assert _samefile('spam/bacon', src, dst)
 
 
-def test_filenames():
-    got = list(frelia.fs.filenames('foo/bar/baz'))
+def test_split_filenames():
+    got = list(frelia.fs.split_filenames('foo/bar/baz'))
     assert got == ['baz', 'bar', 'foo']
 
 
-def test_filenames_absolute():
-    got = list(frelia.fs.filenames('/foo/bar/baz'))
+def test_split_filenames_absolute():
+    got = list(frelia.fs.split_filenames('/foo/bar/baz'))
     assert got == ['baz', 'bar', 'foo', '/']

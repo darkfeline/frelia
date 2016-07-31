@@ -20,10 +20,10 @@ def link_files(src, dst):
         os.link(src_path, dst_path)
 
 
-def filenames(path):
+def split_filenames(path):
     """Yield filename components of a path.
 
-    >>> list(filenames('/foo/bar/baz'))
+    >>> list(split_filenames('/foo/bar/baz'))
     ['baz', 'bar', 'foo', '/']
 
     """

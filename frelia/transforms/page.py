@@ -84,7 +84,7 @@ class DateFromPath:
     @staticmethod
     def _parse_date(path):
         path = os.path.dirname(path)
-        filenames = frelia.fs.filenames(path)
+        filenames = frelia.fs.split_filenames(path)
         parts = tuple(itertools.islice(filenames, 3))
         day, month, year = parts
         return datetime.date(int(year), int(month), int(day))
