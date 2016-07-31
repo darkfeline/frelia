@@ -1,4 +1,4 @@
-"""Custom Jinja Environments."""
+"""Custom Jinja Environment class."""
 
 import jinja2
 
@@ -7,7 +7,12 @@ import frelia.filters
 
 class Environment(jinja2.Environment):
 
-    """Jinja Environment with better defaults."""
+    """Custom Jinja Environment subclass.
+
+    This subclass sets better defaults and includes custom filters from
+    frelia.filters.
+
+    """
 
     __DEFAULT_OPTIONS = {
         'trim_blocks': True,
@@ -37,6 +42,9 @@ class Environment(jinja2.Environment):
 
 def _load_filters_from_module(module):
     """Load filters from a filter module.
+
+    A filter module should include its filter functions in its __all__
+    attribute.
 
     Returns a dict suitable for updating a Jinja Environment's filters.
 

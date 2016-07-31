@@ -4,8 +4,9 @@ import os
 
 
 def walk_files(path):
-    """Generate the pathnames of all files in a directory tree."""
+    """Yield the pathnames of all files in a directory tree."""
     for dirpath, dirnames, filenames in os.walk(path):
+        del dirnames
         for filename in filenames:
             yield os.path.join(dirpath, filename)
 
@@ -20,7 +21,12 @@ def link_files(src, dst):
 
 
 def path_filenames(path):
-    """Split a path and yield its filenames."""
+    """Split a path and yield its component filenames.
+
+    >>> list(path_filenames('/foo/bar/baz'))
+    ['baz', 'bar', 'foo', '/']
+
+    """
     while path:
         path, filename = os.path.split(path)
         if filename:

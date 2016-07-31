@@ -1,3 +1,6 @@
+"""Descriptors used by the frelia package."""
+
+
 class CachedProperty:
 
     """Cached property descriptor.
@@ -10,6 +13,10 @@ class CachedProperty:
     >>> foo = Foo()
     >>> foo.foo
     1
+
+    The cached value is stored on the instance object as an attribute.  By
+    default, this is the name of the function, but this can be overridden by
+    the constructor parameter `attr`.
 
     """
 
