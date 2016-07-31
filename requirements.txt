@@ -1,6 +1,5 @@
 # Required
 Jinja2==2.8
-python-dateutil==2.5.3
 PyYAML==3.11
 
 # For tests

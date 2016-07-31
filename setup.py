@@ -8,7 +8,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Jinja2',
-        'python-dateutil',
         'PyYAML',
     ],
     entry_points={
