@@ -11,7 +11,7 @@ def test_load_pages(tmpdir, document_class, document):
     filepath.write('')
     loader = frelia.page.PageLoader(document_class)
 
-    got = list(loader.load_pages(str(root)))
+    got = list(loader(str(root)))
 
     assert len(got) == 1
     page = got[0]

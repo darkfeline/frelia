@@ -1,23 +1,13 @@
 """frelia page module.
 
-Contains resources for loading and rendering pages.
+Pages are an abstraction to simplify rendering of static webpages.
 
-Documents represent documents of unspecified format.  Documents have metadata
-and content attributes.
+Pages are loaded using PageLoader, rendered using PageRenderer, and written to
+files using PageWriter.
 
-Pages bind documents to paths.  Pages have path and document attributes.
-
-Pages can be loaded from the file system using PageLoader.  You need to pass in
-the document class, which is used to load documents from files.  frelia.enja
-implements one such document class and file format.
-
-Documents are rendered using a DocumentRenderer.  This transforms the
-document's content and metadata into an output format.  This module implements
-JinjaDocumentRenderer.  DocumentRenderers have the method render(document).
-
-Pages are rendered using PageRenderer.  PageRenderer takes a DocumentRenderer
-and renders pages by writing the document's rendered output to the file
-corresponding to the page's path.
+Pages have path and document attributes.  The path indicates where the page
+will be written, and the actual rendering of the page is handled by the
+document.
 
 """
 
@@ -27,29 +17,14 @@ import frelia.descriptors
 import frelia.fs
 
 
-class PageLoader:
-
-    """Page loader."""
-
-    def __init__(self, document_reader):
-        self.document_reader = document_reader
-
-    def load_pages(self, root):
-        """Generate PageResource instances from a directory tree."""
-        document_reader = self.document_reader
-        for filepath in frelia.fs.walk_files(root):
-            with open(filepath) as file:
-                document = document_reader(file)
-            yield Page(filepath, document)
-
-
 class Page:
 
     """Represents a page resource for rendering.
 
     Contains the page itself and the path where the page would be built.
 
-    The rendered_output attribute caches the rendered form of the page's document.
+    The rendered_output attribute caches the rendered form of the page's
+    document.
 
     """
 
@@ -63,6 +38,26 @@ class Page:
             cls=type(self).__name__,
             path=self.path,
             document=self.document)
+
+
+class PageLoader:
+
+    """Page loader.
+
+    Loads pages from a directory.
+
+    """
+
+    def __init__(self, document_reader):
+        self.document_reader = document_reader
+
+    def __call__(self, rootdir):
+        """Generate PageResource instances from a directory tree."""
+        document_reader = self.document_reader
+        for filepath in frelia.fs.walk_files(rootdir):
+            with open(filepath) as file:
+                document = document_reader(file)
+            yield Page(filepath, document)
 
 
 class PageWriter:
