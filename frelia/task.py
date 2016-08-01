@@ -83,10 +83,13 @@ class Task:
             deps=self.deps)
 
     @classmethod
-    def decorate(cls, target, deps=()):
+    def decorate(cls, *dep_tasks):
         """Create a Task by decorating a function."""
-        def decorate(task_func):
-            return cls(target, task_func, deps)
+        def decorate(func):
+            return cls(
+                func.__name__,
+                func,
+                [dep.target for dep in dep_tasks])
         return decorate
 
 
