@@ -70,6 +70,12 @@ class TaskManager:
 
 class Task:
 
+    """A task to run.
+
+    target is a string.  deps is a sequence of strings.
+
+    """
+
     def __init__(self, target, task_func, deps=()):
         self.target = target
         self.task_func = task_func
@@ -83,13 +89,17 @@ class Task:
             deps=self.deps)
 
     @classmethod
-    def decorate(cls, *dep_tasks):
-        """Create a Task by decorating a function."""
+    def decorate(cls, deps=()):
+        """Create a Task by decorating a function.
+
+        deps is a sequence of Tasks.
+
+        """
         def decorate(func):
             return cls(
                 func.__name__,
                 func,
-                [dep.target for dep in dep_tasks])
+                [dep.target for dep in deps])
         return decorate
 
 
