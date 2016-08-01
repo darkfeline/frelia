@@ -8,6 +8,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Jinja2',
+        'networkx',
         'PyYAML',
     ],
     entry_points={

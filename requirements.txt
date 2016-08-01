@@ -1,5 +1,6 @@
 # Required
 Jinja2==2.8
+networkx==1.11
 PyYAML==3.11
 
 # For tests
