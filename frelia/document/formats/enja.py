@@ -12,18 +12,18 @@ import io
 
 import yaml
 
-import frelia.document
+from frelia.document import base
 
 
-def read(file):
+def load(file):
     """Load a document from an enja file."""
     metadata_stream, file = _create_metadata_stream(file)
     metadata = yaml.load(metadata_stream, Loader=yaml.CLoader)
     content = file.read()
-    return frelia.document.Document(metadata, content)
+    return base.Document(metadata, content)
 
 
-def write(document, file):
+def dump(document, file):
     """Write a document to an enja file."""
     yaml.dump(
         document.metadata,

@@ -1,12 +1,12 @@
 import pytest
 
-import frelia.document
+from frelia.document import base
 import frelia.page
 
 
 @pytest.fixture
 def document():
-    return frelia.document.Document({'sophie': 'prachta'}, 'girl meets girl')
+    return base.Document({'sophie': 'prachta'}, 'girl meets girl')
 
 
 @pytest.fixture

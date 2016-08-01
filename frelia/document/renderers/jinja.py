@@ -1,10 +1,3 @@
-"""Document renderers.
-
-Document renderers are callables that take a document object and return some
-kind of rendered output.
-
-"""
-
 import logging
 
 logger = logging.getLogger(__name__)

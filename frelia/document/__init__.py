@@ -1,19 +1,9 @@
-class Document:
+"""document module
 
-    """Document with metadata.
+Documents present a simple abstraction that simplifies static webpage
+generation.  Documents are objects with a content body and metadata (see the
+base module).  Documents can be stored in files in a variety of formats, and
+the metadata and content can be rendered into different document formats via
+renderers.
 
-    A document has structured metadata and a content body, both in an
-    unspecified format.  Basically, a document represents a UNIX file (a bag of
-    bytes, or Unicode text in this case), but with metadata.
-
-    """
-
-    def __init__(self, metadata, content):
-        self.metadata = metadata
-        self.content = content
-
-    def __repr__(self):
-        return '<{cls} at 0x{id:x} with metadata {metadata!r}>'.format(
-            cls=type(self).__name__,
-            id=id(self),
-            metadata=self.metadata)
+"""
