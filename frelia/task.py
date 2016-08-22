@@ -7,6 +7,8 @@ passed the results of their calls.
 
 """
 
+import inspect
+
 import networkx as nx
 
 
@@ -89,18 +91,17 @@ class Task:
             deps=self.deps)
 
     @classmethod
-    def decorate(cls, deps=()):
+    def decorate(cls, func):
         """Create a Task by decorating a function.
 
         deps is a sequence of Tasks.
 
         """
-        def decorate(func):
-            return cls(
-                func.__name__,
-                func,
-                [dep.target for dep in deps])
-        return decorate
+        signature = inspect.signature(func)
+        return cls(
+            func.__name__,
+            func,
+            [param.name for param in signature.parameters.values()])
 
 
 class DuplicateTargetError(ValueError):

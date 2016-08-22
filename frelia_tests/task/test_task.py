@@ -1,11 +1,9 @@
 import frelia.task
 
 
-def test_decorate(uni_task):
-    decorator = frelia.task.Task.decorate(deps=[uni_task])
+def test_decorate():
     def craft(uni): pass
-    func = craft
-    got = decorator(func)
+    got = frelia.task.Task.decorate(craft)
     assert got.target == 'craft'
-    assert got.task_func == func
+    assert got.task_func == craft
     assert got.deps == ['uni']
