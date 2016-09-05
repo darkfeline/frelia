@@ -3,8 +3,8 @@
 import os
 
 
-def walk_files(path):
-    """Yield the pathnames of all files in a directory tree."""
+def find_files(path):
+    """Yield the paths of all files in a directory tree."""
     for dirpath, dirnames, filenames in os.walk(path):
         del dirnames
         for filename in filenames:
@@ -13,7 +13,7 @@ def walk_files(path):
 
 def link_files(src, dst):
     """Hard link files recursively from src to dst.."""
-    for src_path in walk_files(src):
+    for src_path in find_files(src):
         rel_path = os.path.relpath(src_path, src)
         dst_path = os.path.join(dst, rel_path)
         os.makedirs(os.path.dirname(dst_path), exist_ok=True)

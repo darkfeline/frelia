@@ -20,9 +20,9 @@ def dirtree(tmpdir):
     return tmpdir
 
 
-def test_walk_files(dirtree):
+def test_find_files(dirtree):
     root = str(dirtree.join('src'))
-    got = Counter(frelia.fs.walk_files(root))
+    got = Counter(frelia.fs.find_files(root))
     assert got == Counter(
         os.path.join(root, path)
         for path in ('foo/baz', 'spam/bacon')
