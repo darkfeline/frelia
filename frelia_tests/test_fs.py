@@ -44,11 +44,12 @@ def test_link_files(dirtree):
     assert _samefile('spam/bacon', src, dst)
 
 
-def test_split_filenames():
-    got = list(frelia.fs.split_filenames('foo/bar/baz'))
-    assert got == ['baz', 'bar', 'foo']
-
-
-def test_split_filenames_absolute():
-    got = list(frelia.fs.split_filenames('/foo/bar/baz'))
-    assert got == ['baz', 'bar', 'foo', '/']
+@pytest.mark.parametrize(
+    ('path', 'expected'),
+    [
+        ('foo/bar/baz', ['baz', 'bar', 'foo']),
+        ('/foo/bar/baz', ['baz', 'bar', 'foo', '/']),
+    ])
+def test_split_filenames(path, expected):
+    got = list(frelia.fs.split_filenames(path))
+    assert got == expected
