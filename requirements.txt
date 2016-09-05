@@ -4,5 +4,5 @@ networkx==1.11
 PyYAML==3.11
 
 # For tests
-pytest==2.9.1
-pytest-cov==2.2.1
+pytest==3.0.2
+pytest-cov==2.3.1
