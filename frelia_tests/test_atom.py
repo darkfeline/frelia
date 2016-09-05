@@ -15,10 +15,12 @@ def test_render(id, title, updated):
     feed = atom.Feed(id, title, updated)
     file = io.StringIO()
     feed.render(file)
-    assert file.getvalue() == '''\
-<?xml version='1.0' encoding='UTF-8'?>
-<feed xmlns="http://www.w3.org/2005/Atom"><id>http://example.com/</id>\
-<title>Takumi Times</title><updated>2016-01-08T00:00:00</updated></feed>'''
+    assert file.getvalue() == (
+        "<?xml version='1.0' encoding='UTF-8'?>\n"
+        '<feed xmlns="http://www.w3.org/2005/Atom">'
+        '<id>http://example.com/</id>'
+        '<title>Takumi Times</title><updated>2016-01-08T00:00:00</updated>'
+        '</feed>')
 
 
 _FEED_PARAMS = ('id', 'title', 'updated', 'rights', 'links', 'authors',
