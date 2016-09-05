@@ -29,19 +29,19 @@ def test_find_files(dirtree):
     )
 
 
-def _samefile(path, first, second):
-    """Return True if path relative to first and second are the same file."""
+def _assert_samefile(path, first, second):
+    """Assert path relative to first and second are the same file."""
     first = first.join(path)
     second = second.join(path)
-    return first.samefile(second)
+    assert first.samefile(second)
 
 
 def test_link_files(dirtree):
     src = dirtree.join('src')
     dst = dirtree.join('dst')
     frelia.fs.link_files(str(src), str(dst))
-    assert _samefile('foo/baz', src, dst)
-    assert _samefile('spam/bacon', src, dst)
+    _assert_samefile('foo/baz', src, dst)
+    _assert_samefile('spam/bacon', src, dst)
 
 
 @pytest.mark.parametrize(
