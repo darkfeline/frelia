@@ -6,8 +6,7 @@ http://www.sitemaps.org/protocol.html
 
 import datetime
 import numbers
-
-import frelia.jinja
+import xml.etree.ElementTree as ET
 
 
 class URL:
@@ -21,7 +20,24 @@ class URL:
         self.priority = priority
         self.validate()
 
+    def to_xml(self):
+        """Return ElementTree representation."""
+        entry = ET.Element('url')
+        ET.SubElement(entry, 'loc').text = self.loc
+        if self.lastmod is not None:
+            ET.SubElement(entry, 'lastmod').text = self.lastmod.isoformat()
+        if self.changefreq is not None:
+            ET.SubElement(entry, 'changefreq').text = self.changefreq
+        if self.priority is not None:
+            ET.SubElement(entry, 'priority').text = str(self.priority)
+        return entry
+
     def validate(self):
+        """Validate URL attributes.
+
+        Raises ValidationError if an attribute is invalid.
+
+        """
         self._validate_lastmod()
         self._validate_changefreq()
         self._validate_priority()
@@ -60,16 +76,22 @@ class URL:
             raise ValidationError('priority must be a float between 0.0 and 1.0.')
 
 
-def render(urls):
+def render(file, urls):
     """Render sitemap.xml content using provided URLs.
 
-    urls is an iterable.
+    urls is an iterable of URL instances.  file is a text file for writing.
 
     """
-    context = {'urls': urls}
-    env = frelia.jinja.Environment()
-    template = env.get_template('sitemap.xml')
-    return template.render(context)
+    urlset = ET.Element('urlset', {
+        'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9',
+        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+        'xsi:schemaLocation': ' '.join((
+            'http://www.sitemaps.org/schemas/sitemap/0.9',
+            'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd')),
+    })
+    urlset.extend(url.to_xml() for url in urls)
+    document = ET.ElementTree(urlset)
+    document.write(file, encoding='unicode', xml_declaration=True)
 
 
 class ValidationError(Exception): pass
