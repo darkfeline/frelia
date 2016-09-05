@@ -13,7 +13,6 @@ document.
 
 import os
 
-import frelia.descriptors
 import frelia.fs
 
 
