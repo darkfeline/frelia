@@ -1,4 +1,4 @@
-from collections import Counter
+import collections
 import os
 
 import pytest
@@ -6,24 +6,14 @@ import pytest
 import frelia.fs
 
 
-@pytest.fixture
-def dirtree(tmpdir):
-    srcdir = tmpdir.mkdir('src')
-
-    foodir = srcdir.mkdir('foo')
-    foodir.mkdir('bar')
-    foodir.join('baz').write('')
-
-    spamdir = srcdir.mkdir('spam')
-    spamdir.mkdir('eggs')
-    spamdir.join('bacon').write('')
-    return tmpdir
-
-
-def test_find_files(dirtree):
-    root = str(dirtree.join('src'))
-    got = Counter(frelia.fs.find_files(root))
-    assert got == Counter(
+def test_find_files(tmpdir):
+    tmpdir.ensure_dir('foo/bar')
+    tmpdir.join('foo/baz').write('')
+    tmpdir.ensure_dir('spam/eggs')
+    tmpdir.join('spam/bacon').write('')
+    root = str(tmpdir)
+    got = collections.Counter(frelia.fs.find_files(root))
+    assert got == collections.Counter(
         os.path.join(root, path)
         for path in ('foo/baz', 'spam/bacon')
     )
@@ -36,9 +26,11 @@ def _assert_samefile(path, first, second):
     assert first.samefile(second)
 
 
-def test_link_files(dirtree):
-    src = dirtree.join('src')
-    dst = dirtree.join('dst')
+def test_link_files(tmpdir):
+    src = tmpdir.mkdir('src')
+    src.join('foo/baz').write('', ensure=True)
+    src.join('spam/bacon').write('', ensure=True)
+    dst = tmpdir.join('dst')
     frelia.fs.link_files(str(src), str(dst))
     _assert_samefile('foo/baz', src, dst)
     _assert_samefile('spam/bacon', src, dst)
