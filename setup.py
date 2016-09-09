@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 setup(
     name='frelia',
     version='0.1.0',
-    packages=find_packages(exclude=['frelia_tests', 'frelia_tests.*']),
+    packages=find_packages(exclude=['frelia_tests*']),
     install_requires=[
         'networkx',
         'PyYAML',
