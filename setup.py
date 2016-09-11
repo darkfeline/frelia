@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 setup(
-    name='frelia',
+    name='mir.frelia',
     version='0.1.0',
-    packages=find_packages(exclude=['frelia_tests*']),
-    install_requires=[
-        'networkx',
-        'PyYAML',
-    ],
-    entry_points={
-    },
-
+    description='Statis website generator library.',
+    long_description='',
+    keywords='',
+    url='https://github.com/darkfeline/mir.frelia',
     author='Allen Li',
     author_email='darkfeline@felesatra.moe',
-    description='Static website generator library',
-    license='',
-    url='',
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Programming Language :: Python :: 3.5',
+    ],
+
+    packages=[
+        'mir.frelia',
+        'mir.frelia.transforms',
+        'mir.frelia.document',
+    ],
 )

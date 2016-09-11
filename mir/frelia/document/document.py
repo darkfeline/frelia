@@ -1,6 +1,3 @@
-import collections
-
-
 class Document:
 
     """Document with metadata.

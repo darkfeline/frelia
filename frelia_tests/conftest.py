@@ -1,7 +1,7 @@
 import pytest
 
-from frelia.document import base
-import frelia.page
+from mir.frelia.document import document as base
+import mir.frelia.page
 
 
 @pytest.fixture
@@ -11,4 +11,4 @@ def document():
 
 @pytest.fixture
 def page(document):
-    return frelia.page.Page('blog/page', document)
+    return mir.frelia.page.Page('blog/page', document)

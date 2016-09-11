@@ -4,7 +4,7 @@ import io
 
 import pytest
 
-from frelia import atom
+from mir.frelia import atom
 
 
 @pytest.mark.parametrize(

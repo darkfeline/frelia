@@ -3,7 +3,7 @@ import io
 
 import pytest
 
-from frelia import sitemap
+from mir.frelia import sitemap
 
 
 @pytest.mark.parametrize(

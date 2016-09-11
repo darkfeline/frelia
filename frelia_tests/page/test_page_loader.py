@@ -2,14 +2,14 @@ from unittest import mock
 
 import pytest
 
-import frelia.page
+import mir.frelia.page
 
 
 def test_load_pages(tmpdir, document_class, document):
     root = tmpdir.mkdir('root')
     filepath = root.mkdir('blog').join('post')
     filepath.write('')
-    loader = frelia.page.PageLoader(document_class)
+    loader = mir.frelia.page.PageLoader(document_class)
 
     got = list(loader(str(root)))
 

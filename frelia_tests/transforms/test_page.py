@@ -1,12 +1,12 @@
 import datetime
 from unittest import mock
 
-import frelia.page
-import frelia.transforms.page as page_transforms
+import mir.frelia.page
+import mir.frelia.transforms.page as page_transforms
 
 
 def test_document_page_transforms(document):
-    page = frelia.page.Page('foo', document)
+    page = mir.frelia.page.Page('foo', document)
     document_func = mock.Mock()
     page_func = page_transforms.DocumentPageTransforms([document_func])
     page_func([page])

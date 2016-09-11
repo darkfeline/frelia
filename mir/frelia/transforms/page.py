@@ -5,7 +5,7 @@ import itertools
 import logging
 import os
 
-import frelia.fs
+import mir.frelia.fs
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ class DateFromPath:
     @staticmethod
     def _parse_date(path):
         path = os.path.dirname(path)
-        filenames = frelia.fs.split_filenames(path)
+        filenames = mir.frelia.fs.split_filenames(path)
         parts = tuple(itertools.islice(filenames, 3))
         day, month, year = parts
         return datetime.date(int(year), int(month), int(day))

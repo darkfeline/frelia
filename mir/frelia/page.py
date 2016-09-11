@@ -13,7 +13,7 @@ document.
 
 import os
 
-import frelia.fs
+import mir.frelia.fs
 
 
 class Page:
@@ -53,7 +53,7 @@ class PageLoader:
     def __call__(self, rootdir):
         """Generate PageResource instances from a directory tree."""
         document_reader = self.document_reader
-        for filepath in frelia.fs.find_files(rootdir):
+        for filepath in mir.frelia.fs.find_files(rootdir):
             with open(filepath) as file:
                 document = document_reader(file)
             yield Page(filepath, document)

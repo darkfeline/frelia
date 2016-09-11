@@ -1,7 +1,7 @@
 import io
 import textwrap
 
-from frelia.document.formats import enja
+from mir.frelia.document import enja
 
 
 def test_load():
@@ -11,7 +11,8 @@ def test_load():
     ---
     <p>Hello world!</p>""")
     file = io.StringIO(text)
-    doc = enja.load(file)
+    loader = enja.Loader()
+    doc = loader(file)
     assert doc.metadata == {'foo': 'bar'}
     assert doc.content == '<p>Hello world!</p>'
 

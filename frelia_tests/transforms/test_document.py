@@ -1,6 +1,6 @@
 from unittest import mock
 
-import frelia.transforms.document as document_transforms
+import mir.frelia.transforms.document as document_transforms
 
 
 def test_render_template(document):

@@ -3,7 +3,7 @@ from unittest import mock
 import jinja2
 import pytest
 
-from frelia.document.renderers import jinja
+from mir.frelia.document import jinja
 
 # pylint: disable=protected-access
 
@@ -12,23 +12,6 @@ def test_render(env, template, document):
     renderer = jinja.JinjaDocumentRenderer(env)
     got = renderer(document)
     assert got == mock.sentinel.output
-
-
-def test_get_template_name_default(env, document):
-    renderer = jinja.JinjaDocumentRenderer(
-        env,
-        default_template='base.html')
-    got = renderer._get_template_name(document)
-    assert got == 'base.html'
-
-
-def test_get_template_name_explicit(env, document):
-    renderer = jinja.JinjaDocumentRenderer(
-        env,
-        default_template='base.html')
-    document.metadata['template'] = 'explicit.html'
-    got = renderer._get_template_name(document)
-    assert got == 'explicit.html'
 
 
 def test_get_context(env, document):
@@ -46,6 +29,13 @@ def test_get_template(env, template, document):
     got = renderer._get_template(document)
     assert got is template
     assert env.mock_calls == [mock.call.get_template('explicit.html')]
+
+
+def test_get_template_default(env, template, document):
+    renderer = jinja.JinjaDocumentRenderer(env, default_template='base.html')
+    got = renderer._get_template(document)
+    assert got is template
+    assert env.mock_calls == [mock.call.get_template('base.html')]
 
 
 @pytest.fixture

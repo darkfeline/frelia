@@ -1,6 +1,6 @@
 from unittest import mock
 
-import frelia.transforms.generic as generic_transforms
+import mir.frelia.transforms.generic as generic_transforms
 
 
 def test_compose_transforms():

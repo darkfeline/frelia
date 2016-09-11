@@ -13,7 +13,7 @@ import io
 
 import yaml
 
-from frelia.document import document
+from mir.frelia.document import document
 
 
 class BaseLoader(abc.ABC):
@@ -33,7 +33,7 @@ class BaseLoader(abc.ABC):
         """
         raise NotImplementedError
 
-    def load(self, file):
+    def __call__(self, file):
         """Load a document from an enja file."""
         metadata_stream, file = _create_metadata_stream(file)
         metadata = yaml.load(metadata_stream, Loader=yaml.CLoader)
