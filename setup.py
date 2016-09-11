@@ -23,4 +23,8 @@ setup(
         'mir.frelia.transforms',
         'mir.frelia.document',
     ],
+    install_requires=[
+        'networkx',
+        'PyYAML',
+    ],
 )
