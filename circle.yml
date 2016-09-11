@@ -4,8 +4,8 @@ machine:
 dependencies:
   override:
     - pip3 install -r requirements.txt
-    - python3 setup.py develop
+    - pip3 install .
 test:
   override:
-    - py.test
+    - pytest
     - bash <(curl -s https://codecov.io/bash)
