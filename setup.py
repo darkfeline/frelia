@@ -24,6 +24,7 @@ setup(
         'mir.frelia.document',
     ],
     install_requires=[
+        'mir.monads',
         'networkx',
         'PyYAML',
     ],
