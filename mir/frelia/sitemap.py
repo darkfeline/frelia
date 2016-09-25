@@ -3,14 +3,10 @@
 http://www.sitemaps.org/protocol.html
 """
 
-import collections
 import datetime
 import io
 import numbers
 import xml.etree.ElementTree as ET
-
-
-URL = collections.namedtuple('URL', 'loc,lastmod,changefreq,priority')
 
 
 class URL:
