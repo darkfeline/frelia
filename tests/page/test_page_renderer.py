@@ -1,11 +1,14 @@
-from unittest import mock
+import pytest
 
-import mir.frelia.page
+from mir.frelia.document import Document
+import mir.frelia.page as page_mod
 
 
-def test_page_renderer(document_renderer, page):
-    assert page.rendered_output is None
-    renderer = mir.frelia.page.PageRenderer(document_renderer)
-    renderer([page])
-    assert page.rendered_output == 'rendered content'
-    assert document_renderer.mock_calls == [mock.call.render(page.document)]
+@pytest.mark.parametrize('page,expected', [
+    (page_mod.Page('foo/bar', Document({}, 'hi')),
+     [page_mod.RenderedPage('foo/bar', 'hi')]),
+])
+def test_page_renderer(simple_document_renderer, page, expected):
+    renderer = page_mod.PageRenderer(simple_document_renderer)
+    rendered_pages = renderer([page])
+    assert list(rendered_pages) == expected

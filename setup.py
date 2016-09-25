@@ -21,11 +21,10 @@ setup(
     packages=[
         'mir.frelia',
         'mir.frelia.transforms',
-        'mir.frelia.document',
     ],
     install_requires=[
-        'mir.monads',
+        'mir.monads==0.2.0',
         'networkx',
-        'PyYAML',
+        'PyYAML>=3.12,<4.0',
     ],
 )

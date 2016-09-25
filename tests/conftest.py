@@ -1,14 +1,34 @@
+import functools
+from unittest import mock
+
+import jinja2
 import pytest
 
-from mir.frelia.document import document as base
-import mir.frelia.page
+# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture
-def document():
-    return base.Document({'sophie': 'prachta'}, 'girl meets girl')
+def env():
+    env = mock.create_autospec(jinja2.Environment, instance=True)
+    env.get_template.side_effect = _get_template
+    env.from_string.side_effect = _from_string
+    return env
 
 
-@pytest.fixture
-def page(document):
-    return mir.frelia.page.Page('blog/page', document)
+def _get_template(name, *args, **kwargs):
+    """Fake get_template() method."""
+    template = mock.create_autospec(jinja2.Template, instance=True)
+    template.render.side_effect = functools.partial(_render, name)
+    return template
+
+
+def _render(text, context={}):
+    """Fake render() method."""
+    return '%s %r' % (text, sorted(context.items()))
+
+
+def _from_string(source, *args, **kwargs):
+    """Fake from_string() method."""
+    template = mock.create_autospec(jinja2.Template, instance=True)
+    template.render.side_effect = functools.partial(_render, source)
+    return template

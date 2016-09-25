@@ -1,18 +1,16 @@
-import mir.frelia.page
+import pytest
+
+import mir.frelia.page as page_mod
 
 
-def test_page_writer_missing_rendered_output(tmpdir, page):
+@pytest.mark.parametrize('pages', [
+    [
+        page_mod.RenderedPage('blog/page', 'rendered content'),
+    ]
+])
+def test_page_writer(tmpdir, pages):
     target_dir = str(tmpdir.join('dst'))
-    writer = mir.frelia.page.PageWriter(target_dir)
-    assert page.rendered_output is None
-    writer([page])
-    assert not tmpdir.join('dst').check()
-
-
-def test_page_writer(tmpdir, page):
-    target_dir = str(tmpdir.join('dst'))
-    writer = mir.frelia.page.PageWriter(target_dir)
-    page.rendered_output = 'rendered content'
-    writer([page])
+    writer = page_mod.PageWriter(target_dir)
+    writer(pages)
     rendered_file = tmpdir.join('dst/blog/page')
     assert rendered_file.read() == 'rendered content'

@@ -1,26 +1,15 @@
-from unittest import mock
-
-import pytest
-
-import mir.frelia.page
+import mir.frelia.page as page_mod
 
 
-def test_load_pages(tmpdir, document_class, document):
+def test_load_pages(tmpdir, simple_document_reader):
     root = tmpdir.mkdir('root')
     filepath = root.mkdir('blog').join('post')
-    filepath.write('')
-    loader = mir.frelia.page.PageLoader(document_class)
+    filepath.write('test')
+    loader = page_mod.PageLoader(simple_document_reader)
 
     got = list(loader(str(root)))
 
     assert len(got) == 1
     page = got[0]
     assert page.path == str(filepath)
-    assert page.document is document
-
-
-@pytest.fixture
-def document_class(document):
-    cls = mock.Mock([])
-    cls.return_value = document
-    return cls
+    assert page.document.body == 'test'

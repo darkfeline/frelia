@@ -1,3 +1,8 @@
+"""Document renderers.
+
+This module contains callables for rendering the body of documents.
+"""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,13 +32,13 @@ class JinjaDocumentRenderer:
 
     @staticmethod
     def _get_context(document):
-        """Get context for rendering document."""
-        context = document.metadata.copy()
-        context['content'] = document.content
+        """Get the context for rendering the document."""
+        context = document.header.copy()
+        context['content'] = document.body
         return context
 
     def _get_template(self, document):
-        """Get Jinja template for document."""
-        template_name = document.metadata.get('template',
-                                              self.default_template)
+        """Get the Jinja template for the document."""
+        template_name = document.header.get('template',
+                                            self.default_template)
         return self.env.get_template(template_name)
