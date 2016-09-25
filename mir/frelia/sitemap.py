@@ -1,17 +1,21 @@
-"""Sitemaps.
+"""Sitemap generator.
 
 http://www.sitemaps.org/protocol.html
-
 """
 
+import collections
 import datetime
+import io
 import numbers
 import xml.etree.ElementTree as ET
 
 
+URL = collections.namedtuple('URL', 'loc,lastmod,changefreq,priority')
+
+
 class URL:
 
-    """Represents a sitemap url."""
+    """Sitemap URL."""
 
     def __init__(self, loc, lastmod=None, changefreq=None, priority=None):
         self.loc = loc
@@ -19,6 +23,11 @@ class URL:
         self.changefreq = changefreq
         self.priority = priority
         self.validate()
+
+    def __repr__(self):
+        return ('{cls}(loc={this.loc!r}, lastmod={this.lastmod!r}),'
+                ' changefreq={this.changefreq!r}, priority={this.priority!r})'
+                .format(cls=type(self).__qualname__, this=self))
 
     def to_xml(self):
         """Return ElementTree representation."""
@@ -36,7 +45,6 @@ class URL:
         """Validate URL attributes.
 
         Raises ValidationError if an attribute is invalid.
-
         """
         self._validate_lastmod()
         self._validate_changefreq()
@@ -76,11 +84,10 @@ class URL:
             raise ValidationError('priority must be a float between 0.0 and 1.0.')
 
 
-def render(file, urls):
+def render(file: io.TextIOBase, urls):
     """Render sitemap.xml content using provided URLs.
 
     urls is an iterable of URL instances.  file is a text file for writing.
-
     """
     urlset = ET.Element('urlset', {
         'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9',
