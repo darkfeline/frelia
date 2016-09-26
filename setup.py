@@ -24,7 +24,6 @@ setup(
     ],
     install_requires=[
         'mir.monads==0.2.0',
-        'networkx',
         'PyYAML>=3.12,<4.0',
     ],
 )
