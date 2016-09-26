@@ -29,7 +29,7 @@ class Loader:
         header_stream, file = _create_header_stream(file)
         header = yaml.load(header_stream, Loader=yaml.CLoader)
         body = file.read()
-        return Document(header, body)
+        return Document({} if header is None else header, body)
 
 
 def dump(doc, file):

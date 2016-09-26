@@ -11,6 +11,7 @@ from mir.frelia.document import Document
 @pytest.mark.parametrize('text,header,body', [
     ('foo: bar\n---\n<p>Hello world!</p>',
      {'foo': 'bar'}, '<p>Hello world!</p>'),
+    ('', {}, ''),
 ])
 def test_load(text, header, body):
     """Test parsing a simple enja document from a file."""

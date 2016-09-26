@@ -10,18 +10,20 @@ from mir.frelia.page import Page
 
 def render_doc(documents):
     """Simple document renderer."""
-    for document in documents:
+    for document in documents:  # pragma: no branch
         yield document._replace(body='rendered ' + document.body)
 
 
-@pytest.mark.parametrize('text,expected', [
-    ('hi', 'rendered hi'),
+@pytest.mark.parametrize('texts,expected', [
+    (['hi'], ['rendered hi']),
+    ([], []),
 ])
-def test_lift_page(text, expected):
-    page = Page(mock.sentinel.dummy, Document({}, text))
+def test_lift_page(texts, expected):
+    pages = [Page(mock.sentinel.dummy, Document({}, text)) for text in texts]
     page_func = alchemy.LiftPage(render_doc)
-    got = page_func([page])
-    assert list(got) == [Page(mock.sentinel.dummy, Document({}, expected))]
+    got = page_func(pages)
+    assert list(got) == [Page(mock.sentinel.dummy, Document({}, text))
+                         for text in expected]
 
 
 def test_rebase_page_path():

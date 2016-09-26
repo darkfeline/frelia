@@ -13,7 +13,7 @@ def test_find_files(tmpdir):
     tmpdir.join('spam/bacon').write('')
     root = str(tmpdir)
     got = collections.Counter(mir.frelia.fs.find_files(root))
-    assert got == collections.Counter(
+    assert got == collections.Counter(  # pragma: no branch
         os.path.join(root, path)
         for path in ('foo/baz', 'spam/bacon')
     )

@@ -250,7 +250,7 @@ class LiftPage:
 
     def __call__(self, pages):
         pages1, pages2 = itertools.tee(pages)
-        new_documents = self.function(page.document for page in pages1)
+        new_documents = self.function(page.document for page in pages1)  # pragma: no branch
         yield from (
             page._replace(document=new_document)
             for page, new_document in zip(pages2, new_documents)
