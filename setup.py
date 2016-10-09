@@ -23,7 +23,7 @@ setup(
         'mir.frelia.transforms',
     ],
     install_requires=[
-        'mir.monads==0.2.0',
+        'mir.monads==0.3.0',
         'PyYAML>=3.12,<4.0',
     ],
 )
