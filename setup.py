@@ -18,10 +18,7 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
 
-    packages=[
-        'mir.frelia',
-        'mir.frelia.transforms',
-    ],
+    packages=['mir.frelia'],
     install_requires=[
         'mir.monads==0.3.0',
         'PyYAML>=3.12,<4.0',
