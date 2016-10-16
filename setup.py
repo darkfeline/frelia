@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name='mir.frelia',
     version='0.1.0',
-    description='Statis website generator library.',
+    description='Static website generator library.',
     long_description='',
     keywords='',
     url='https://github.com/darkfeline/mir.frelia',
