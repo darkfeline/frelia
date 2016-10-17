@@ -1,10 +1,9 @@
 import collections
-from unittest import mock
 
 import pytest
 
 import mir.frelia.alchemy as alchemy
-from mir.frelia.document import Document
+from mir.frelia.enja import Document
 
 
 def test_render_template():

@@ -15,9 +15,27 @@ import io
 
 import yaml
 
-from mir.frelia.document import Document
-
 _DIVIDER = '---\n'
+
+
+class Document:
+
+    """Document with metadata.
+
+    A document has two slots: header and body.  The header contains a metadata
+    dict, and the body contains a string.  The Document class does not dictate
+    any particular format for the header or the body.
+    """
+
+    def __init__(self, header, body):
+        self.header = header
+        self.body = body
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return self.header == other.header and self.body == other.body
+        else:
+            return NotImplemented
 
 
 class Loader:
@@ -28,8 +46,10 @@ class Loader:
         """Load a document from an Enja file."""
         header_stream, file = _create_header_stream(file)
         header = yaml.load(header_stream, Loader=yaml.CLoader)
+        if header is None:
+            header = {}
         body = file.read()
-        return Document({} if header is None else header, body)
+        return Document(header, body)
 
 
 def dump(doc, file):

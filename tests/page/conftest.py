@@ -1,6 +1,6 @@
 import pytest
 
-from mir.frelia.document import Document
+import mir.frelia.enja as enja
 
 
 @pytest.fixture
@@ -14,5 +14,5 @@ def simple_document_renderer():
 def simple_document_reader():
     def reader(file):
         text = file.read()
-        return Document({}, text)
+        return enja.Document({}, text)
     return reader

@@ -1,9 +1,8 @@
 import collections
-from unittest import mock
 
 import pytest
 
-from mir.frelia.document import Document
+from mir.frelia.enja import Document
 import mir.frelia.renderers as renderers
 
 RenderTest = collections.namedtuple('RenderTest', 'document,expected')

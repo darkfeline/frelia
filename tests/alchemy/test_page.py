@@ -4,14 +4,15 @@ from unittest import mock
 import pytest
 
 import mir.frelia.alchemy as alchemy
-from mir.frelia.document import Document
+from mir.frelia.enja import Document
 from mir.frelia.page import Page
 
 
 def render_doc(documents):
     """Simple document renderer."""
     for document in documents:  # pragma: no branch
-        yield document._replace(body='rendered ' + document.body)
+        document.body = 'rendered ' + document.body
+        yield document
 
 
 @pytest.mark.parametrize('texts,expected', [

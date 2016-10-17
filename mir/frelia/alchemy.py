@@ -26,7 +26,6 @@ import string
 
 from mir.monads.id import Identity
 
-from mir.frelia.document import Document
 import mir.frelia.fs
 
 logger = logging.getLogger(__name__)
@@ -72,11 +71,11 @@ class RenderTemplateDocument:
     def __call__(self, documents):
         copy = self.mapping.copy
         for document in documents:
-            assert isinstance(document, Document)
             mapping = copy()
             mapping.update(document.header)
             template = string.Template(document.body)
-            yield document._replace(body=template.safe_substitute(mapping))
+            document.body = template.safe_substitute(mapping)
+            yield document
 
 
 def _flatten_mapping(mapping, separator='_', prefix=''):
@@ -131,7 +130,8 @@ class RenderJinjaDocument:
             logger.debug('Rendering document content for %r...', document)
             document_as_template = template_from_string(document.body)
             rendered_content = document_as_template.render(document.header)
-            yield document._replace(body=rendered_content)
+            document.body = rendered_content
+            yield document
 
 
 class CopyMetadata:
@@ -177,7 +177,8 @@ class SetDefaultMetadata:
         for document in documents:
             new_header = make_copy()
             new_header.update(document.header)
-            yield document._replace(header=new_header)
+            document.header = new_header
+            yield document
 
 
 class SetDateFromPath:

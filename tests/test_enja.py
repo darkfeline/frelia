@@ -5,7 +5,6 @@ import io
 import pytest
 
 import mir.frelia.enja as enja
-from mir.frelia.document import Document
 
 
 @pytest.mark.parametrize('text,header,body', [
@@ -23,7 +22,7 @@ def test_load(text, header, body):
 
 
 @pytest.mark.parametrize('document,text', [
-    (Document({'sophie': 'prachta'}, 'girl meets girl'),
+    (enja.Document({'sophie': 'prachta'}, 'girl meets girl'),
      'sophie: prachta\n---\ngirl meets girl'),
 ])
 def test_dump(document, text):
@@ -31,3 +30,7 @@ def test_dump(document, text):
     file = io.StringIO()
     enja.dump(document, file)
     assert file.getvalue() == text
+
+
+def test_document_equal_nondocument():
+    assert enja.Document({}, '') != object()
