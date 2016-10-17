@@ -25,93 +25,118 @@ def test_render():
 
 def test_feed():
     """Test Feed."""
-    element = atom.Feed(
+    feed = atom.Feed(
         id='http://example.com/',
         title='Example site',
         updated=datetime.datetime(2016, 1, 8))
 
+    element = feed._to_etree()
     assert element.tag == 'feed'
     assert element.find('id').text == 'http://example.com/'
     assert element.find('title').text == 'Example site'
     assert element.find('updated').text == '2016-01-08T00:00:00'
 
 
-def test_entry():
-    """Test Entry."""
-    element = atom.Entry(
+def test_entry_to_etree():
+    """Test Entry._to_etree()."""
+    entry = atom.Entry(
         id='http://example.com/pandora',
         title='Pandora',
         updated=datetime.datetime(2016, 1, 8))
+    element = entry._to_etree()
     assert element.tag == 'entry'
     assert element.find('id').text == 'http://example.com/pandora'
     assert element.find('title').text == 'Pandora'
     assert element.find('updated').text == '2016-01-08T00:00:00'
 
 
-def test_author():
-    """Test Author."""
-    element = atom.Author('Nene')
-    element.append(atom.URI('http://example.com/'))
-    element.append(atom.Email('dork@example.com'))
+def test_full_entry_to_etree():
+    """Test full Entry._to_etree()."""
+    entry = atom.Entry(
+        id='http://example.com/pandora',
+        title='Pandora',
+        updated=datetime.datetime(2016, 1, 8))
+    entry.published = datetime.datetime(2016, 1, 9)
+    entry.summary = 'girl meets girl'
+    element = entry._to_etree()
+    assert element.tag == 'entry'
+    assert element.find('id').text == 'http://example.com/pandora'
+    assert element.find('title').text == 'Pandora'
+    assert element.find('updated').text == '2016-01-08T00:00:00'
+    assert element.find('published').text == '2016-01-09T00:00:00'
+    assert element.find('summary').text == 'girl meets girl'
+
+
+def test_author_to_etree():
+    """Test Author._to_etree()."""
+    author = atom.Author('Nene')
+    element = author._to_etree()
+    assert element.tag == 'author'
+    assert element.find('name').text == 'Nene'
+    assert element.find('uri') is None
+    assert element.find('email') is None
+
+
+def test_full_author_to_etree():
+    """Test full Author._to_etree()."""
+    author = atom.Author('Nene')
+    author.uri = 'http://example.com/'
+    author.email = 'dork@example.com'
+    element = author._to_etree()
     assert element.tag == 'author'
     assert element.find('name').text == 'Nene'
     assert element.find('uri').text == 'http://example.com/'
     assert element.find('email').text == 'dork@example.com'
 
 
-def test_category():
-    """Test Category."""
-    element = atom.Category('dork')
-    element.set_scheme('http://example.com/')
-    element.set_label('Nene')
-    assert element.tag == 'category'
-    assert element.get('term', None) == 'dork'
-    assert element.get('scheme', None) == 'http://example.com/'
-    assert element.get('label', None) == 'Nene'
+def test_link_to_etree():
+    """Test Link._to_etree()."""
+    link = atom.Link('http://example.com/')
+    element = link._to_etree()
+    assert element.tag == 'link'
+    assert element.get('href', None) == 'http://example.com/'
+    assert element.get('rel', None) is None
+    assert element.get('type', None) is None
 
 
-def test_link():
-    """Test Link."""
-    element = atom.Link('http://example.com/')
-    element.set_rel('alternate')
-    element.set_type('text/html')
+def test_full_link_to_etree():
+    """Test full Link._to_etree()."""
+    link = atom.Link('http://example.com/')
+    link.rel = 'alternate'
+    link.type = 'text/html'
+    element = link._to_etree()
     assert element.tag == 'link'
     assert element.get('href', None) == 'http://example.com/'
     assert element.get('rel', None) == 'alternate'
     assert element.get('type', None) == 'text/html'
 
 
-def test__elem_identity():
-    """Test _elem returns Element."""
-    element = ET.Element('h1')
-    assert atom._elem(element) is element
+def test_category_to_etree():
+    """Test Category._to_etree()."""
+    category = atom.Category('dork')
+    element = category._to_etree()
+    assert element.tag == 'category'
+    assert element.get('term', None) == 'dork'
+    assert element.get('scheme', None) is None
+    assert element.get('label', None) is None
 
 
-def test__elem_type_error():
-    """Test _elem on bad type."""
-    with pytest.raises(TypeError):
-        atom._elem(object())
+def test_full_category_to_etree():
+    """Test full Category._to_etree()."""
+    category = atom.Category('dork')
+    category.scheme = 'http://example.com/'
+    category.label = 'Nene'
+    element = category._to_etree()
+    assert element.tag == 'category'
+    assert element.get('term', None) == 'dork'
+    assert element.get('scheme', None) == 'http://example.com/'
+    assert element.get('label', None) == 'Nene'
 
 
-def test__Element_text():
-    """Test _Element text property."""
-    element = atom._Element('h1')
-    element.text = 'test'
-    assert element.text == 'test'
-
-
-def test__Element_extend():
-    """Test _Element extend()."""
-    element = atom._Element('h1')
-    children = [ET.Element('p')]
-    element.extend(children)
-    assert list(element) == children
-
-
-def test__TextElement_TextConstruct():
-    """Test _TextElement with TextConstruct."""
+def test__TextElement_type():
+    """Test _TextElement with type."""
     element = atom._TextElement(
-        tag='title',
-        text=atom.TextConstruct('hello', type='html'))
-    assert element.get('type', 'html')
-    assert element.text == 'hello'
+        tag='summary',
+        text='girl meets girl',
+        type='text/html')
+    assert element.get('type') == 'text/html'
