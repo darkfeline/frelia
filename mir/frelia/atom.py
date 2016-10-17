@@ -1,154 +1,159 @@
 """Atom feed generator
 
-This module contains classes representing RFC 4287 Atom documents and elements.
-The classes have required and optional attributes corresponding to the elements
-in the RFC.  Elements have a method, to_xml(), that returns an ElementTree
-representation of themselves.  Documents can be rendered to files using
-render().
-
-Currently, not all Atom documents and elements are implemented.
-
 Classes:
 
-Feed -- Atom Feed Document
-Entry
+Feed -- Atom feed root element
+Entry -- Feed entry element
+
+Author -- Author metadata element
+Link -- Link metadata element
+Category -- Category metadata element
+
+ID -- ID metadata element
+Title -- Title metadata element
+Rights -- Rights metadata element
+Name -- Name metadata element
+Summary -- Summary metadata element
+URI -- URI metadata element
+Email -- Email metadata element
+
+Published -- Published metadata element
+Updated -- Updated metadata element
+
+TextConstruct -- Atom text construct
 
 https://tools.ietf.org/html/rfc4287
 """
 
+import collections
 import datetime
 import functools
 import io
-import typing
 import xml.etree.ElementTree as ET
 
-from mir.monads import maybe
 
+def _elem(object):
+    """Type casting for Element.
 
-class Document:
-
-    """Atom Document.
-
-    Documents are created with a root element and support rendering to a file.
+    This is needed because subclassing etree classes breaks them, so we must
+    encapsulate them and pretend we're subclassing.
     """
+    if isinstance(object, ET.Element):
+        return object
+    elif isinstance(object, _Element):
+        return object._element
+    else:
+        raise TypeError('Invalid element %r' % object)
 
-    def __init__(self, root_element: ET.Element):
-        self.root = root_element
 
-    def render(self, file: io.TextIOBase):
-        """Render document to the file."""
-        document = ET.ElementTree(self.root)
+class _Element:
+
+    """Pretend subclass of etree.Element."""
+
+    def __init__(self, *args, **kwargs):
+        self._element = ET.Element(*args, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self._element, name)
+
+    def __iter__(self):
+        return iter(self._element)
+
+    @property
+    def text(self):
+        return self._element.text
+
+    @text.setter
+    def text(self, value):
+        self._element.text = value
+
+    def append(self, element):
+        """Add entry or metadata element."""
+        self._element.append(_elem(element))
+
+    def extend(self, elements):
+        self._element.extend(_elem(element) for element in elements)
+
+
+class Feed(_Element):
+
+    def __init__(self, id, title, updated: datetime.date):
+        super().__init__('feed')
+        self.set('xmlns', 'http://www.w3.org/2005/Atom')
+        self.append(ID(id))
+        self.append(Title(title))
+        self.append(Updated(updated))
+
+    def write(self, file: io.TextIOBase):
+        """Write XML document to file."""
+        document = ET.ElementTree(self._element)
         document.write(file, encoding='unicode', xml_declaration=True)
 
 
-def Feed(id, title, updated, rights=None, links=(), authors=(), entries=()):
-    """Atom Feed element constructor."""
-    element = ET.Element('feed')
-    element.set('xmlns', 'http://www.w3.org/2005/Atom')
-    _TextSubElement(element, ID, id)
-    _TextSubElement(element, Title, title)
-    _TextSubElement(element, Updated, updated)
-    _MaybeTextSubElement(element, Rights, rights)
-    element.extend(links)
-    element.extend(authors)
-    element.extend(entries)
-    return element
+class Entry(_Element):
+
+    def __init__(self, id, title, updated: datetime.date):
+        super().__init__('entry')
+        self.append(ID(id))
+        self.append(Title(title))
+        self.append(Updated(updated))
 
 
-def Entry(id, title, updated, summary=None, published=None, links=(),
-          categories=()):
-    """Atom Entry element constructor."""
-    element = ET.Element('entry')
-    _TextSubElement(element, ID, id)
-    _TextSubElement(element, Title, title)
-    _TextSubElement(element, Updated, updated)
-    _MaybeTextSubElement(element, Summary, summary)
-    _MaybeTextSubElement(element, Published, published)
-    element.extend(links)
-    element.extend(categories)
-    return element
+class _Person(_Element):
+
+    def __init__(self, tag, name):
+        super().__init__(tag)
+        self.append(Name(name))
 
 
-def _init_person(self, name, uri=None, email=None):
-    """Atom Person construct constructor.
+class Author(_Person):
 
-    This function is a detached method.
-    """
-    _TextSubElement(self, Name, name)
-    _MaybeTextSubElement(self, URI, uri)
-    _MaybeTextSubElement(self, Email, email)
+    def __init__(self, name):
+        super().__init__(tag='author', name=name)
 
 
-def Author(name, uri=None, email=None):
-    """Atom Author metadata element constructor."""
-    element = ET.Element('author')
-    _init_person(element, name, uri, email)
-    return element
+class Link(_Element):
+
+    def __init__(self, href):
+        super().__init__('link')
+        self.set('href', href)
+
+    def set_rel(self, rel):
+        self.set('rel', rel)
+
+    def set_type(self, type):
+        self.set('type', type)
 
 
-def Link(href, rel=None, type=None):
-    """Atom Link metadata element constructor."""
-    element = ET.Element('link')
-    element.set('href', href)
-    _maybe_set(element, 'rel', rel)
-    _maybe_set(element, 'type', type)
-    return element
+class Category(_Element):
+
+    def __init__(self, term):
+        super().__init__('category')
+        self.set('term', term)
+
+    def set_scheme(self, scheme):
+        self.set('scheme', scheme)
+
+    def set_label(self, label):
+        self.set('label', label)
 
 
-def Category(term, scheme=None, label=None):
-    """Atom Category metadata element constructor."""
-    element = ET.Element('category')
-    element.set('term', term)
-    _maybe_set(element, 'scheme', scheme)
-    _maybe_set(element, 'label', label)
-    return element
+class _TextElement(_Element):
+
+    def __init__(self, tag, text):
+        super().__init__(tag)
+        if isinstance(text, TextConstruct):
+            self.text = text.text
+            self.set('type', text.type)
+        else:
+            self.text = text
 
 
-def _maybe_set(self: ET.Element, key: str, value: typing.Optional[str]):
-    """Set the attribute key to value if value isn't None.
+class _DateElement(_Element):
 
-    This function is a detached method.
-    """
-    if value is not None:
-        self.set(key, value)
-
-
-def _TextElement(tag: str, text_construct: 'TextConstruct'):
-    """Text Element constructor.
-
-    This represents an Atom Element that contains only a Text Construct.
-    """
-    element = ET.Element(tag)
-    element.text = str(text_construct)
-    text_construct.set_type(element)
-    return element
-
-
-class TextConstruct:
-
-    """Text Construct.
-
-    Represents an Atom Text Construct, which is basically a string with an
-    optional type.
-    """
-
-    def __init__(self, text='', type=None):
-        self._text = text
-        self._type = type
-
-    def __repr__(self):
-        return '{cls}({object!r}, type={type!r})'.format(
-            cls=type(self).__qualname__,
-            object=self._text,
-            type=self._type)
-
-    def __str__(self):
-        return self._text
-
-    def set_type(self, element):
-        """Set the type attribute of the element."""
-        if self._type is not None:
-            element.set('type', self._type)
+    def __init__(self, tag, date: datetime.date):
+        super().__init__(tag)
+        self.text = date.isoformat()
 
 
 ID = functools.partial(_TextElement, 'id')
@@ -159,35 +164,7 @@ Summary = functools.partial(_TextElement, 'summary')
 URI = functools.partial(_TextElement, 'uri')
 Email = functools.partial(_TextElement, 'email')
 
+Published = functools.partial(_DateElement, 'published')
+Updated = functools.partial(_DateElement, 'updated')
 
-def _DataElement(tag: str, dt: datetime.date):
-    """Construct an Atom Element that contains only a Date Construct."""
-    assert isinstance(dt, datetime.date)
-    return _TextElement(tag, (TextConstruct(dt.isoformat())))
-
-
-Published = functools.partial(_DataElement, 'published')
-Updated = functools.partial(_DataElement, 'updated')
-
-
-def _TextSubElement(element: ET.Element, sub_type, text):
-    """Create a subelement with given text value.
-
-    If text is a string, it will be coerced into a TextConstruct.
-    """
-    if isinstance(text, str):
-        text = TextConstruct(text)
-    subelement = sub_type(text)
-    element.append(subelement)
-    return subelement
-
-
-def _MaybeTextSubElement(element: ET.Element, sub_type, text):
-    """Create a subelement with given text value if text is not None.
-
-    Returns a Maybe monad.
-    """
-    if text is None:
-        return maybe.Nothing()
-    else:
-        return maybe.Just(_TextSubElement(element, sub_type, text))
+TextConstruct = collections.namedtuple('TextConstruct', 'text type')

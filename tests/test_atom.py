@@ -1,123 +1,117 @@
-import collections
 import datetime
 import io
+import xml.etree.ElementTree as ET
 
 import pytest
 
 from mir.frelia import atom
 
 
-@pytest.mark.parametrize(
-    ('id', 'title', 'updated'),
-    [('http://example.com/', 'Takumi Times', datetime.datetime(2016, 1, 8))]
-)
-def test_render(id, title, updated):
+def test_render():
     """Test document rendering."""
-    feed = atom.Feed(id, title, updated)
-    document = atom.Document(feed)
+    feed = atom.Feed(
+        id='http://example.com/',
+        title='Example site',
+        updated=datetime.datetime(2016, 1, 8))
     file = io.StringIO()
-    document.render(file)
+    feed.write(file)
     assert file.getvalue() == (
         "<?xml version='1.0' encoding='UTF-8'?>\n"
         '<feed xmlns="http://www.w3.org/2005/Atom">'
         '<id>http://example.com/</id>'
-        '<title>Takumi Times</title><updated>2016-01-08T00:00:00</updated>'
+        '<title>Example site</title><updated>2016-01-08T00:00:00</updated>'
         '</feed>')
 
 
-_FEED_PARAMS = ('id', 'title', 'updated', 'rights', 'links', 'authors',
-                'entries')
-_FeedTest = collections.namedtuple('_FeedTest', _FEED_PARAMS)
-
-
-@pytest.mark.parametrize(
-    _FEED_PARAMS,
-    [_FeedTest(
+def test_feed():
+    """Test Feed."""
+    element = atom.Feed(
         id='http://example.com/',
-        title='Takumi Times',
-        updated=datetime.datetime(2016, 1, 8),
-        rights='Public Domain',
-        links=(),
-        authors=(),
-        entries=())])
-def test_feed(id, title, updated, rights, links, authors, entries):
-    """Test Feed.to_xml()."""
-    element = atom.Feed(id, title, updated, rights, links, authors, entries)
+        title='Example site',
+        updated=datetime.datetime(2016, 1, 8))
+
     assert element.tag == 'feed'
-    assert element.find('id').text == id
-    assert element.find('title').text == title
-    assert element.find('updated').text == updated.isoformat()
-    assert element.find('rights').text == rights
+    assert element.find('id').text == 'http://example.com/'
+    assert element.find('title').text == 'Example site'
+    assert element.find('updated').text == '2016-01-08T00:00:00'
 
 
-_ENTRY_PARAMS = ('id', 'title', 'updated', 'summary', 'summary_type',
-                 'published', 'links', 'categories')
-_EntryTest = collections.namedtuple('_EntryTest', _ENTRY_PARAMS)
-
-
-@pytest.mark.parametrize(
-    _ENTRY_PARAMS,
-    [_EntryTest(
+def test_entry():
+    """Test Entry."""
+    element = atom.Entry(
         id='http://example.com/pandora',
         title='Pandora',
-        updated=datetime.datetime(2016, 1, 8),
-        summary='Girl meets girl',
-        summary_type='html',
-        published=datetime.datetime(2012, 10, 10),
-        links=(),
-        categories=())])
-def test_entry(id, title, updated, summary, summary_type, published, links,
-               categories):
-    """Test Entry.to_xml()."""
-    element = atom.Entry(
-        id=id,
-        title=title,
-        updated=updated,
-        summary=atom.TextConstruct(summary, type=summary_type),
-        published=published,
-        links=links,
-        categories=categories)
+        updated=datetime.datetime(2016, 1, 8))
     assert element.tag == 'entry'
-    assert element.find('id').text == id
-    assert element.find('title').text == title
-    assert element.find('updated').text == updated.isoformat()
-    assert element.find('summary').text == summary
-    assert element.find('summary').get('type') == summary_type
-    assert element.find('published').text == published.isoformat()
+    assert element.find('id').text == 'http://example.com/pandora'
+    assert element.find('title').text == 'Pandora'
+    assert element.find('updated').text == '2016-01-08T00:00:00'
 
 
-@pytest.mark.parametrize(
-    ('name', 'uri', 'email'),
-    [('Nene', 'http://example.com/', 'dork@example.com')])
-def test_author(name, uri, email):
-    """Test Author.to_xml()."""
-    element = atom.Author(name, uri, email)
+def test_author():
+    """Test Author."""
+    element = atom.Author('Nene')
+    element.append(atom.URI('http://example.com/'))
+    element.append(atom.Email('dork@example.com'))
     assert element.tag == 'author'
-    assert element.find('name').text == name
-    assert element.find('uri').text == uri
-    assert element.find('email').text == email
+    assert element.find('name').text == 'Nene'
+    assert element.find('uri').text == 'http://example.com/'
+    assert element.find('email').text == 'dork@example.com'
 
 
-@pytest.mark.parametrize('term,scheme,label', [
-    ('dork', 'http://example.com/', 'Nene'),
-    ('dork', 'http://example.com/', None),
-])
-def test_category(term, scheme, label):
-    """Test Category.to_xml()."""
-    element = atom.Category(term, scheme, label)
+def test_category():
+    """Test Category."""
+    element = atom.Category('dork')
+    element.set_scheme('http://example.com/')
+    element.set_label('Nene')
     assert element.tag == 'category'
-    assert element.get('term', None) == term
-    assert element.get('scheme', None) == scheme
-    assert element.get('label', None) == label
+    assert element.get('term', None) == 'dork'
+    assert element.get('scheme', None) == 'http://example.com/'
+    assert element.get('label', None) == 'Nene'
 
 
-@pytest.mark.parametrize(
-    ('href', 'rel', 'type'),
-    [('http://example.com/', 'alternate', 'text/html')])
-def test_link(href, rel, type):
+def test_link():
     """Test Link."""
-    element = atom.Link(href, rel, type)
+    element = atom.Link('http://example.com/')
+    element.set_rel('alternate')
+    element.set_type('text/html')
     assert element.tag == 'link'
-    assert element.get('href', None) == href
-    assert element.get('rel', None) == rel
-    assert element.get('type', None) == type
+    assert element.get('href', None) == 'http://example.com/'
+    assert element.get('rel', None) == 'alternate'
+    assert element.get('type', None) == 'text/html'
+
+
+def test__elem_identity():
+    """Test _elem returns Element."""
+    element = ET.Element('h1')
+    assert atom._elem(element) is element
+
+
+def test__elem_type_error():
+    """Test _elem on bad type."""
+    with pytest.raises(TypeError):
+        atom._elem(object())
+
+
+def test__Element_text():
+    """Test _Element text property."""
+    element = atom._Element('h1')
+    element.text = 'test'
+    assert element.text == 'test'
+
+
+def test__Element_extend():
+    """Test _Element extend()."""
+    element = atom._Element('h1')
+    children = [ET.Element('p')]
+    element.extend(children)
+    assert list(element) == children
+
+
+def test__TextElement_TextConstruct():
+    """Test _TextElement with TextConstruct."""
+    element = atom._TextElement(
+        tag='title',
+        text=atom.TextConstruct('hello', type='html'))
+    assert element.get('type', 'html')
+    assert element.text == 'hello'
