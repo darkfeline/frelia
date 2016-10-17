@@ -12,7 +12,7 @@ def find_files(path):
 
 
 def link_files(src, dst):
-    """Hard link files recursively from src to dst.."""
+    """Hard link files recursively from src to dst."""
     for src_path in find_files(src):
         rel_path = os.path.relpath(src_path, src)
         dst_path = os.path.join(dst, rel_path)
@@ -25,7 +25,6 @@ def split_filenames(path):
 
     >>> list(split_filenames('/foo/bar/baz'))
     ['baz', 'bar', 'foo', '/']
-
     """
     while path:
         path, filename = os.path.split(path)
