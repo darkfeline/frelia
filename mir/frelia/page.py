@@ -10,24 +10,39 @@ Pages are loaded using PageLoader, rendered using PageRenderer, and written to
 files using PageWriter.
 """
 
-import collections
 import os
 
 import mir.frelia.fs
 
 
-Page = collections.namedtuple('Page', 'path,document')
-Page.__doc__ = """Page to be rendered.
+class Page:
 
-path is relative to some hypothetical website root.
-"""
+    """Webpage defined by a path and document."""
+
+    def __init__(self, path, document):
+        self.path = path
+        self.document = document
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return self.path == other.path and self.document == other.document
+        else:
+            return NotImplemented
 
 
-RenderedPage = collections.namedtuple('RenderedPage', 'path,text')
-RenderedPage.__doc__ = """Rendered Page.
+class RenderedPage:
 
-path is relative to the destination directory that the page will be written to.
-"""
+    """Webpage defined by a path and text."""
+
+    def __init__(self, path, text):
+        self.path = path
+        self.text = text
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return self.path == other.path and self.text == other.text
+        else:
+            return NotImplemented
 
 
 class PageLoader:

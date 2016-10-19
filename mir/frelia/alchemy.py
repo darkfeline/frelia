@@ -234,7 +234,8 @@ class RebasePagePath:
         basepath = self.basepath
         for page in pages:
             new_path = os.path.relpath(page.path, basepath)
-            yield page._replace(path=new_path)
+            page.path = new_path
+            yield page
 
 
 class LiftPage:
@@ -252,7 +253,6 @@ class LiftPage:
     def __call__(self, pages):
         pages1, pages2 = itertools.tee(pages)
         new_documents = self.function(page.document for page in pages1)  # pragma: no branch
-        yield from (
-            page._replace(document=new_document)
-            for page, new_document in zip(pages2, new_documents)
-        )
+        for page, new_document in zip(pages2, new_documents):
+            page.document = new_document
+            yield page
