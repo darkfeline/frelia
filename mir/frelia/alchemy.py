@@ -201,7 +201,7 @@ class SetDateFromPath:
         fieldname = self.fieldname
         parse_date = _parse_date_from_path
         for page in pages:
-            metadata = page.document.header
+            metadata = page.content.header
             if fieldname not in metadata:
                 try:
                     metadata[fieldname] = parse_date(page.path)
@@ -252,7 +252,7 @@ class LiftPage:
 
     def __call__(self, pages):
         pages1, pages2 = itertools.tee(pages)
-        new_documents = self.function(page.document for page in pages1)  # pragma: no branch
+        new_documents = self.function(page.content for page in pages1)  # pragma: no branch
         for page, new_document in zip(pages2, new_documents):
             page.document = new_document
             yield page

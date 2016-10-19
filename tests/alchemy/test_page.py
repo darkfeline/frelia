@@ -6,7 +6,6 @@ import pytest
 import mir.frelia.alchemy as alchemy
 from mir.frelia.enja import Document
 from mir.frelia.page import Page
-from mir.frelia.page import RenderedPage
 
 
 def render_doc(documents):
@@ -46,7 +45,7 @@ def test_date_from_path(path, header, expected):
     page = Page(path, Document(header, ''))
     transform = alchemy.SetDateFromPath('published')
     got = transform([page])
-    assert list(page.document.header for page in got) == [expected]
+    assert list(page.content.header for page in got) == [expected]
 
 
 def test_page_equal():
@@ -55,11 +54,3 @@ def test_page_equal():
 
 def test_page_unequal_wrong_type():
     assert Page('post', 'content') != object()
-
-
-def test_rendered_page_equal():
-    assert RenderedPage('post', 'content') == RenderedPage('post', 'content')
-
-
-def test_rendered_page_unequal_wrong_type():
-    assert RenderedPage('post', 'content') != object()

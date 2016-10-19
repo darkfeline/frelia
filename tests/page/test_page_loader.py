@@ -12,4 +12,4 @@ def test_load_pages(tmpdir, simple_document_reader):
     assert len(got) == 1
     page = got[0]
     assert page.path == str(filepath)
-    assert page.document.body == 'test'
+    assert page.content.body == 'test'

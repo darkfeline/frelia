@@ -5,7 +5,7 @@ import mir.frelia.page as page_mod
 
 @pytest.mark.parametrize('pages', [
     [
-        page_mod.RenderedPage('blog/page', 'rendered content'),
+        page_mod.Page('blog/page', 'rendered content'),
     ]
 ])
 def test_page_writer(tmpdir, pages):
