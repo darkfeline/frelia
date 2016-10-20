@@ -38,9 +38,12 @@ class Document:
             return NotImplemented
 
 
-class Loader:
+class BaseLoader:
 
     """Loader for Enja formatted documents."""
+
+    def __init__(self, document_cls):
+        self.document_cls = document_cls
 
     def __call__(self, file):
         """Load a document from an Enja file."""
@@ -49,7 +52,10 @@ class Loader:
         if header is None:
             header = {}
         body = file.read()
-        return Document(header, body)
+        return self.document_cls(header, body)
+
+
+load = BaseLoader(Document)
 
 
 def dump(doc, file):

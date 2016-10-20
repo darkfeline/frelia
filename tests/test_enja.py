@@ -15,8 +15,7 @@ import mir.frelia.enja as enja
 def test_load(text, header, body):
     """Test parsing a simple enja document from a file."""
     file = io.StringIO(text)
-    loader = enja.Loader()
-    doc = loader(file)
+    doc = enja.load(file)
     assert doc.header == header
     assert doc.body == body
 
