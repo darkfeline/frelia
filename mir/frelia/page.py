@@ -30,9 +30,26 @@ class Page:
         else:
             return NotImplemented
 
+    def publish(self, dir):
+        """Write the page to a file in the directory.
+
+        The path of the file is the page's path, relative to the directory.
+        """
+        dst = os.path.join(dir, self.path)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        with open(dst, 'w') as file:
+            file.write(self.content)
+
+    def pipe(self, func):
+        """Pipe the page's content through the function.
+
+        More explicitly, call the given function with page.content and assign
+        its return value to the page.content.
+        """
+        self.content = func(self.content)
+
 
 class BasePageLoader:
-
     """Page loader.
 
     Loads pages from a directory.
@@ -53,34 +70,3 @@ class BasePageLoader:
 
 
 PageLoader = functools.partial(BasePageLoader, Page)
-
-
-class PageRenderer:
-
-    """Render page content using an arbitrary renderer function."""
-
-    def __init__(self, renderer):
-        self.renderer = renderer
-
-    def __call__(self, pages):
-        renderer = self.renderer
-        for page in pages:
-            rendered_content = renderer(page.content)
-            page.content = rendered_content
-            yield page
-
-
-class PageWriter:
-
-    """Write pages to files."""
-
-    def __init__(self, target_dir):
-        self.target_dir = target_dir
-
-    def __call__(self, pages):
-        target_dir = self.target_dir
-        for page in pages:
-            dst = os.path.join(target_dir, page.path)
-            os.makedirs(os.path.dirname(dst), exist_ok=True)
-            with open(dst, 'w') as file:
-                file.write(page.content)
