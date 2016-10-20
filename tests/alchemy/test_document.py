@@ -7,10 +7,19 @@ from mir.frelia.enja import Document
 
 
 def test_render_template():
-    render = alchemy.RenderTemplateDocument({'ion': 'earthes'})
-    doc = Document({'sophie': 'prachta'}, 'hello $ion $sophie')
-    got = render([doc])
-    assert list(doc.body for doc in got) == ['hello earthes prachta']
+    document = Document({'sophie': 'prachta'}, 'hello $ion $sophie')
+    alchemy.render_template(document, {'ion': 'earthes'})
+    assert document.body == 'hello earthes prachta'
+
+
+def test_flatten_mapping_identity():
+    got = alchemy.flatten_mapping({'sophie': 'prachta'})
+    assert got == {'sophie': 'prachta'}
+
+
+def test_flatten_mapping():
+    got = alchemy.flatten_mapping({'pairs': {'sophie': 'prachta'}})
+    assert got == {'pairs_sophie': 'prachta'}
 
 
 def test_render_as_template(env):

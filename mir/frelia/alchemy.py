@@ -17,6 +17,7 @@ Transmutations should:
 - may or may not mutate the objects in place.
 """
 
+from collections.abc import Mapping
 import datetime
 import itertools
 import logging
@@ -28,57 +29,39 @@ import mir.frelia.fs
 logger = logging.getLogger(__name__)
 
 
-class RenderTemplateDocument:
-
+def render_template(document, mapping):
     """Render documents using Python templates.
 
     Python templates provide the fastest possible templating in Python and are
     significantly faster than Jinja templates.
     """
-
-    def __init__(self, mapping):
-        self.mapping = _flatten_mapping(mapping)
-
-    def __repr__(self):
-        return '{cls}({this.mapping!r})'.format(
-            cls=type(self).__qualname__,
-            this=self)
-
-    def __call__(self, documents):
-        copy = self.mapping.copy
-        for document in documents:
-            mapping = copy()
-            mapping.update(document.header)
-            template = string.Template(document.body)
-            document.body = template.safe_substitute(mapping)
-            yield document
+    mapping = mapping.copy()
+    mapping.update(document.header)
+    template = string.Template(document.body)
+    document.body = template.safe_substitute(mapping)
 
 
-def _flatten_mapping(mapping, separator='_', prefix=''):
+def flatten_mapping(mapping, separator='_', prefix=''):
     """Flatten nested mappings.
 
-    >>> got = _flatten_mapping({'foo': {'bar': 'baz'}})
+    >>> got = flatten_mapping({'foo': {'bar': 'baz'}})
     >>> got == {'foo_bar': 'baz'}
     True
     """
-    if prefix:
-        prefix = prefix + separator
-        new_mapping = _add_prefix_to_keys(mapping, prefix)
-    else:
-        new_mapping = mapping.copy()
-    nested_mappings = {key: value for key, value in mapping.items()
-                       if isinstance(value, dict)}
-    for key, value in nested_mappings.items():
-        value = _flatten_mapping(
-            mapping=value,
+    new_mapping = _prefix_keys(mapping, prefix)
+    nested_mappings = ((key, value) for key, value in mapping.items()
+                       if isinstance(value, Mapping))
+    for key, mapping in nested_mappings:
+        new_items = flatten_mapping(
+            mapping=mapping,
             separator=separator,
-            prefix=prefix + key if prefix else key)
+            prefix=prefix + key + separator)
         new_mapping.pop(key)
-        new_mapping.update(value)
+        new_mapping.update(new_items)
     return new_mapping
 
 
-def _add_prefix_to_keys(mapping, prefix):
+def _prefix_keys(mapping, prefix):
     """Prepend a prefix to all keys in a mapping."""
     return {prefix + key: value for key, value in mapping.items()}
 
