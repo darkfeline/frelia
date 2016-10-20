@@ -8,25 +8,6 @@ from mir.frelia.enja import Document
 from mir.frelia.page import Page
 
 
-def render_doc(documents):
-    """Simple document renderer."""
-    for document in documents:  # pragma: no branch
-        document.body = 'rendered ' + document.body
-        yield document
-
-
-@pytest.mark.parametrize('texts,expected', [
-    (['hi'], ['rendered hi']),
-    ([], []),
-])
-def test_lift_page(texts, expected):
-    pages = [Page(mock.sentinel.dummy, Document({}, text)) for text in texts]
-    page_func = alchemy.LiftPage(render_doc)
-    got = page_func(pages)
-    assert list(got) == [Page(mock.sentinel.dummy, Document({}, text))
-                         for text in expected]
-
-
 def test_rebase_page_path():
     page = Page('root/blog/post', mock.sentinel.dummy)
     transform = alchemy.RebasePagePath('root')

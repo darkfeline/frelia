@@ -31,5 +31,20 @@ def test_dump(document, text):
     assert file.getvalue() == text
 
 
+def test_document_equal():
+    assert (enja.Document({'sophie': 'prachta'}, 'girl meets girl')
+            == enja.Document({'sophie': 'prachta'}, 'girl meets girl'))
+
+
+@pytest.mark.parametrize('a,b', [
+    (enja.Document({'sophie': 'prachta'}, ''),
+     enja.Document({'sophie': 'prachta'}, 'girl meets girl')),
+    (enja.Document({'sophie': 'prachta'}, 'girl meets girl'),
+     enja.Document({}, 'girl meets girl')),
+])
+def test_document_unequal(a, b):
+    assert a != b
+
+
 def test_document_equal_nondocument():
     assert enja.Document({}, '') != object()

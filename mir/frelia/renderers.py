@@ -25,7 +25,7 @@ class JinjaDocumentRenderer:
 
     def __call__(self, document):
         """Render document."""
-        logger.debug('Rendering document %r with %r...', document, self)
+        logger.debug('Rendering document %r with %r.', document, self)
         template = self._get_template(document)
         context = self._get_context(document)
         return template.render(context)

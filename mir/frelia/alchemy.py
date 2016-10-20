@@ -236,23 +236,3 @@ class RebasePagePath:
             new_path = os.path.relpath(page.path, basepath)
             page.path = new_path
             yield page
-
-
-class LiftPage:
-
-    """Lift document transmutation to page transmutation."""
-
-    def __init__(self, function):
-        self.function = function
-
-    def __repr__(self):
-        return '{cls}({this.function!r})'.format(
-            cls=type(self).__qualname__,
-            this=self)
-
-    def __call__(self, pages):
-        pages1, pages2 = itertools.tee(pages)
-        new_documents = self.function(page.content for page in pages1)  # pragma: no branch
-        for page, new_document in zip(pages2, new_documents):
-            page.document = new_document
-            yield page
