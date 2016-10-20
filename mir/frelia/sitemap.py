@@ -56,7 +56,7 @@ class URL:
                 'changefreq must be one of: '
                 + ', '.join(repr(value) for value in self._VALID_CHANGEFREQ))
 
-    _VALID_CHANGEFREQ = [
+    _VALID_CHANGEFREQ = frozenset((
         None,
         'always',
         'hourly',
@@ -65,7 +65,7 @@ class URL:
         'monthly',
         'yearly',
         'never',
-    ]
+    ))
 
     def _validate_priority(self):
         good = self.priority is None or (
