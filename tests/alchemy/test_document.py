@@ -13,11 +13,26 @@ def test_render_template():
     assert list(doc.body for doc in got) == ['hello earthes prachta']
 
 
-def test_render_jinja(env):
-    render = alchemy.RenderJinjaDocument(env)
+def test_render_as_template(env):
+    renderer = alchemy.JinjaRenderer(env)
     doc = Document({'sophie': 'prachta'}, 'hello')
-    got = render([doc])
-    assert list(doc.body for doc in got) == ["hello [('sophie', 'prachta')]"]
+    renderer.render_as_template(doc)
+    assert doc.body == "hello [('sophie', 'prachta')]"
+
+
+def test_jinja_render_default_template(env):
+    renderer = alchemy.JinjaRenderer(env)
+    got = renderer.render(Document({'sophie': 'prachta'}, 'girl meets girl'))
+    assert got == ("base.html [('content', 'girl meets girl'),"
+                   " ('sophie', 'prachta')]")
+
+
+def test_jinja_render_explicit_template(env):
+    renderer = alchemy.JinjaRenderer(env)
+    got = renderer.render(Document({'template': 'prachta.html'},
+                                   'girl meets girl'))
+    assert got == ("prachta.html [('content', 'girl meets girl'),"
+                   " ('template', 'prachta.html')]")
 
 
 def test_set_default_metadata():

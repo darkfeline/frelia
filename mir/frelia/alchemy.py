@@ -5,9 +5,8 @@ module is included in the frelia package because rendering a static site can
 involve many processing steps over many pages.  By using the concept of
 transmutations, these processes can be more easily organized.
 
-By moving function calls and attribute lookups out of the loops over the
-objects, transmutations also run significantly faster than a more
-straightforward implementation.
+By moving function calls and attribute lookups out of the loops, transmutations
+also run significantly faster than a more straightforward implementation.
 
 Transmutations should:
 
@@ -101,37 +100,52 @@ def _flatten_mapping(mapping, separator='_', prefix=''):
         new_mapping.update(value)
     return new_mapping
 
+
 def _add_prefix_to_keys(mapping, prefix):
     """Prepend a prefix to all keys in a mapping."""
     return {prefix + key: value for key, value in mapping.items()}
 
 
-class RenderJinjaDocument:
-
-    """Render documents using Jinja.
-
-    This renders the document content as a Jinja template.  This allows the use
-    of Jinja macros in the document, for example.
-
-    This is extremely slow.
-    """
+class JinjaRenderer:
 
     def __init__(self, env):
         self.env = env
 
     def __repr__(self):
-        return '{cls}({this.env!r})'.format(
-            cls=type(self).__qualname__,
-            this=self)
+        return '{cls}({env!r})'.format(
+            cls=type(self).__qualname__, env=self.env)
 
-    def __call__(self, documents):
-        template_from_string = self.env.from_string
-        for document in documents:
-            logger.debug('Rendering document content for %r...', document)
-            document_as_template = template_from_string(document.body)
-            rendered_content = document_as_template.render(document.header)
-            document.body = rendered_content
-            yield document
+    def render_as_template(self, document):
+        """Render a document as a Jinja template.
+
+        This allows the use of Jinja macros in the document.  Compare with
+        jinja_render().
+
+        This is extremely slow.
+        """
+        logger.debug('Rendering %r content with %r.', document, self)
+        document_as_template = self.env.from_string(document.body)
+        rendered_content = document_as_template.render(document.header)
+        document.body = rendered_content
+
+    def render(self, document, default_template='base.html'):
+        """Render a document using Jinja."""
+        logger.debug('Rendering document %r with %r.', document, self)
+        template = self._get_template(document, default_template)
+        context = self._get_context(document)
+        return template.render(context)
+
+    @staticmethod
+    def _get_context(document):
+        """Get the context for rendering the document."""
+        context = document.header.copy()
+        context['content'] = document.body
+        return context
+
+    def _get_template(self, document, default_template):
+        """Get the Jinja template for the document."""
+        template_name = document.header.get('template', default_template)
+        return self.env.get_template(template_name)
 
 
 class CopyMetadata:
