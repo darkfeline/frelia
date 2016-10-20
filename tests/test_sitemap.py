@@ -29,14 +29,14 @@ def test_invalid_urls(loc, lastmod, changefreq, priority):
         ('http://localhost/', None, None, None),
         ('http://localhost/', datetime.datetime(2010, 1, 2), 'daily', 0.5),
     ])
-def test_to_xml(loc, lastmod, changefreq, priority):
-    """Test URL.to_xml()."""
+def test_to_etree(loc, lastmod, changefreq, priority):
+    """Test URL.to_etree()."""
     url = sitemap.URL(
         loc=loc,
         lastmod=lastmod,
         changefreq=changefreq,
         priority=priority)
-    got = url.to_xml()
+    got = url.to_etree()
     assert got.find('loc').text == loc
     if lastmod is None:
         assert got.find('lastmod') is None

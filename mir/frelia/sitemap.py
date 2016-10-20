@@ -25,7 +25,7 @@ class URL:
                 ' changefreq={this.changefreq!r}, priority={this.priority!r})'
                 .format(cls=type(self).__qualname__, this=self))
 
-    def to_xml(self):
+    def to_etree(self):
         """Return etree XML representation of the URL."""
         entry = ET.Element('url')
         ET.SubElement(entry, 'loc').text = self.loc
@@ -88,7 +88,7 @@ def write_sitemap_urlset(file: io.TextIOBase, urls):
             'http://www.sitemaps.org/schemas/sitemap/0.9',
             'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd')),
     })
-    urlset.extend(url.to_xml() for url in urls)
+    urlset.extend(url.to_etree() for url in urls)
     document = ET.ElementTree(urlset)
     document.write(file, encoding='unicode', xml_declaration=True)
 
