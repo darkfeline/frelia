@@ -23,32 +23,9 @@ import logging
 import os
 import string
 
-from mir.monads.id import Identity
-
 import mir.frelia.fs
 
 logger = logging.getLogger(__name__)
-
-
-class compose:
-
-    """Compose transmutation functions."""
-
-    def __init__(self, *functions):
-        self.functions = functions
-
-    def __repr__(self):
-        return '{cls}({this.functions!r})'.format(
-            cls=type(self).__qualname__,
-            this=self)
-
-    def __call__(self, iterable):
-        """Apply all transmutation functions to objects."""
-        functor = Identity(iterable)
-        for function in self.functions:
-            functor = functor.fmap(function)
-        result_iterable, = functor
-        yield from result_iterable
 
 
 class RenderTemplateDocument:
