@@ -60,7 +60,7 @@ def test_render():
         changefreq='daily',
         priority=0.7)
     file = io.StringIO()
-    sitemap.render(file, [url])
+    sitemap.write_sitemap_urlset(file, [url])
     assert file.getvalue() == (
         "<?xml version='1.0' encoding='UTF-8'?>\n"
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'

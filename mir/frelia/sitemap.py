@@ -26,7 +26,7 @@ class URL:
                 .format(cls=type(self).__qualname__, this=self))
 
     def to_xml(self):
-        """Return ElementTree representation."""
+        """Return etree XML representation of the URL."""
         entry = ET.Element('url')
         ET.SubElement(entry, 'loc').text = self.loc
         if self.lastmod is not None:
@@ -47,13 +47,17 @@ class URL:
         self._validate_priority()
 
     def _validate_lastmod(self):
-        bad = (
-            self.lastmod is not None
-            and not isinstance(self.lastmod, datetime.date))
-        if bad:
+        if not isinstance(self.lastmod, (datetime.date, type(None))):
             raise ValidationError('lastmod must be a date or datetime.')
 
+    def _validate_changefreq(self):
+        if self.changefreq not in self._VALID_CHANGEFREQ:
+            raise ValidationError(
+                'changefreq must be one of: '
+                + ', '.join(repr(value) for value in self._VALID_CHANGEFREQ))
+
     _VALID_CHANGEFREQ = [
+        None,
         'always',
         'hourly',
         'daily',
@@ -63,25 +67,17 @@ class URL:
         'never',
     ]
 
-    def _validate_changefreq(self):
-        bad = (
-            self.changefreq is not None
-            and self.changefreq not in self._VALID_CHANGEFREQ)
-        if bad:
-            raise ValidationError('changefreq must be one of a few valid values.')
-
     def _validate_priority(self):
-        bad = (
-            self.priority is not None
-            and not (
-                isinstance(self.priority, numbers.Real)
-                and 0 <= self.priority <= 1))
-        if bad:
-            raise ValidationError('priority must be a float between 0.0 and 1.0.')
+        good = self.priority is None or (
+            isinstance(self.priority, numbers.Real)
+            and 0 <= self.priority <= 1)
+        if not good:
+            raise ValidationError(
+                'priority must be a float between 0.0 and 1.0.')
 
 
-def render(file: io.TextIOBase, urls):
-    """Render sitemap.xml content using provided URLs.
+def write_sitemap_urlset(file: io.TextIOBase, urls):
+    """Write sitemap urlset to a file.
 
     urls is an iterable of URL instances.  file is a text file for writing.
     """
@@ -97,4 +93,5 @@ def render(file: io.TextIOBase, urls):
     document.write(file, encoding='unicode', xml_declaration=True)
 
 
-class ValidationError(Exception): pass
+class ValidationError(Exception):
+    """Sitemap validation error."""
