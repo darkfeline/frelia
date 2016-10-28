@@ -6,59 +6,67 @@ import pytest
 from mir.frelia import sitemap
 
 
-@pytest.mark.parametrize(
-    'loc,lastmod,changefreq,priority',
-    [
-        ('http://localhost/', datetime.time(1, 2, 3), None, None),
-        ('http://localhost/', None, 'DAILY', None),
-        ('http://localhost/', None, None, 1.1),
-    ])
-def test_invalid_urls(loc, lastmod, changefreq, priority):
-    """Test constructing invalid URLs."""
+def test_url_repr():
+    url = sitemap.URL('http://localhost/')
+    got = repr(url)
+    assert got == ("<URL with loc='http://localhost/',"
+                   " lastmod=None, changefreq=None, priority=None>")
+
+
+def test_url_invalid_lastmod():
+    url = sitemap.URL('http://localhost/')
     with pytest.raises(sitemap.ValidationError):
-        sitemap.URL(
-            loc=loc,
-            lastmod=lastmod,
-            changefreq=changefreq,
-            priority=priority)
+        url.lastmod = datetime.time(1, 2, 3)
 
 
-@pytest.mark.parametrize(
-    'loc,lastmod,changefreq,priority',
-    [
-        ('http://localhost/', None, None, None),
-        ('http://localhost/', datetime.datetime(2010, 1, 2), 'daily', 0.5),
-    ])
-def test_to_etree(loc, lastmod, changefreq, priority):
-    """Test URL.to_etree()."""
-    url = sitemap.URL(
-        loc=loc,
-        lastmod=lastmod,
-        changefreq=changefreq,
-        priority=priority)
+def test_url_invalid_changefreq():
+    url = sitemap.URL('http://localhost/')
+    with pytest.raises(sitemap.ValidationError):
+        url.changefreq = 'foo'
+
+
+def test_url_invalid_changefreq_capitalization():
+    url = sitemap.URL('http://localhost/')
+    with pytest.raises(sitemap.ValidationError):
+        url.changefreq = 'DAILY'
+
+
+def test_url_invalid_priority_range():
+    url = sitemap.URL('http://localhost/')
+    with pytest.raises(sitemap.ValidationError):
+        url.priority = 1.1
+
+
+def test_complete_url_to_etree():
+    url = sitemap.URL('http://localhost/')
+    url.lastmod = datetime.datetime(2010, 1, 2)
+    url.changefreq = 'daily'
+    url.priority = 0.5
+
     got = url.to_etree()
-    assert got.find('loc').text == loc
-    if lastmod is None:
-        assert got.find('lastmod') is None
-    else:
-        assert got.find('lastmod').text == lastmod.isoformat()
-    if changefreq is None:
-        assert got.find('changefreq') is None
-    else:
-        assert got.find('changefreq').text == changefreq
-    if priority is None:
-        assert got.find('priority') is None
-    else:
-        assert got.find('priority').text == str(priority)
+    assert got.find('loc').text == 'http://localhost/'
+    assert got.find('lastmod').text == '2010-01-02T00:00:00'
+    assert got.find('changefreq').text == 'daily'
+    assert got.find('priority').text == '0.5'
+
+
+def test_minimal_url_to_etree():
+    url = sitemap.URL('http://localhost/')
+
+    got = url.to_etree()
+    assert got.find('loc').text == 'http://localhost/'
+    assert got.find('lastmod') is None
+    assert got.find('changefreq') is None
+    assert got.find('priority') is None
 
 
 def test_render():
     """Test rendering a sitemap urlset."""
-    url = sitemap.URL(
-        loc='http://localhost/',
-        lastmod=datetime.date(2010, 1, 2),
-        changefreq='daily',
-        priority=0.7)
+    url = sitemap.URL('http://localhost/')
+    url.lastmod=datetime.date(2010, 1, 2)
+    url.changefreq = 'daily'
+    url.priority = 0.7
+
     file = io.StringIO()
     sitemap.write_sitemap_urlset(file, [url])
     assert file.getvalue() == (

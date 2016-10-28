@@ -13,16 +13,15 @@ class URL:
 
     """Sitemap URL."""
 
-    def __init__(self, loc, lastmod=None, changefreq=None, priority=None):
+    def __init__(self, loc):
         self.loc = loc
-        self.lastmod = lastmod
-        self.changefreq = changefreq
-        self.priority = priority
-        self.validate()
+        self.lastmod = None
+        self.changefreq = None
+        self.priority = None
 
     def __repr__(self):
-        return ('{cls}(loc={this.loc!r}, lastmod={this.lastmod!r}),'
-                ' changefreq={this.changefreq!r}, priority={this.priority!r})'
+        return ('<{cls} with loc={this.loc!r}, lastmod={this.lastmod!r},'
+                ' changefreq={this.changefreq!r}, priority={this.priority!r}>'
                 .format(cls=type(self).__qualname__, this=self))
 
     def to_etree(self):
@@ -37,21 +36,29 @@ class URL:
             ET.SubElement(entry, 'priority').text = str(self.priority)
         return entry
 
-    def validate(self):
-        """Validate URL attributes.
+    @property
+    def lastmod(self):
+        return self._lastmod
 
-        Raises ValidationError if an attribute is invalid.
-        """
-        self._validate_lastmod()
-        self._validate_changefreq()
-        self._validate_priority()
-
-    def _validate_lastmod(self):
-        if not isinstance(self.lastmod, (datetime.date, type(None))):
+    @lastmod.setter
+    def lastmod(self, value):
+        if self._valid_lastmod(value):
+            self._lastmod = value
+        else:
             raise ValidationError('lastmod must be a date or datetime.')
 
-    def _validate_changefreq(self):
-        if self.changefreq not in self._VALID_CHANGEFREQ:
+    def _valid_lastmod(self, value):
+        return isinstance(value, (datetime.date, type(None)))
+
+    @property
+    def changefreq(self):
+        return self._changefreq
+
+    @changefreq.setter
+    def changefreq(self, value):
+        if value in self._VALID_CHANGEFREQ:
+            self._changefreq = value
+        else:
             raise ValidationError(
                 'changefreq must be one of: '
                 + ', '.join(repr(value) for value in self._VALID_CHANGEFREQ))
@@ -67,13 +74,22 @@ class URL:
         'never',
     ))
 
-    def _validate_priority(self):
-        good = self.priority is None or (
-            isinstance(self.priority, numbers.Real)
-            and 0 <= self.priority <= 1)
-        if not good:
+    @property
+    def priority(self):
+        return self._priority
+
+    @priority.setter
+    def priority(self, value):
+        if self._valid_priority(value):
+            self._priority = value
+        else:
             raise ValidationError(
                 'priority must be a float between 0.0 and 1.0.')
+
+    def _valid_priority(self, value):
+        return value is None or (
+            isinstance(value, numbers.Real)
+            and 0 <= value <= 1)
 
 
 def write_sitemap_urlset(file: io.TextIOBase, urls):
