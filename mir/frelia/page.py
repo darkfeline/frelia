@@ -30,6 +30,10 @@ class Page:
         else:
             return NotImplemented
 
+    def rebase_path(self, basepath):
+        """Rebase the page's path relative to basepath."""
+        self.path = os.path.relpath(self.path, basepath)
+
     def publish(self, dir):
         """Write the page to a file in the directory.
 

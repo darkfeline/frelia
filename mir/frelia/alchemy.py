@@ -191,23 +191,3 @@ def _parse_date_from_path(path):
     filenames = mir.frelia.fs.split_filenames(path)
     day, month, year = tuple(itertools.islice(filenames, 3))
     return datetime.date(int(year), int(month), int(day))
-
-
-class RebasePagePath:
-
-    """Rebase page paths relative to a base path."""
-
-    def __init__(self, basepath):
-        self.basepath = basepath
-
-    def __repr__(self):
-        return '{cls}({this.basepath!r})'.format(
-            cls=type(self).__qualname__,
-            this=self)
-
-    def __call__(self, pages):
-        basepath = self.basepath
-        for page in pages:
-            new_path = os.path.relpath(page.path, basepath)
-            page.path = new_path
-            yield page
