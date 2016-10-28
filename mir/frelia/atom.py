@@ -29,21 +29,21 @@ class Feed:
         self.categories = []
         self.entries = []
 
-    def _to_etree(self):
+    def to_etree(self):
         element = ET.Element('feed')
         element.set('xmlns', 'http://www.w3.org/2005/Atom')
         element.append(_ID(self.id))
         element.append(_Title(self.title))
         element.append(_Updated(self.updated))
         element.extend(
-            item._to_xml()
+            item.to_etree()
             for item in itertools.chain(self.categories, self.entries)
         )
         return element
 
     def write(self, file: io.TextIOBase):
         """Write XML document to file."""
-        document = ET.ElementTree(self._to_etree())
+        document = ET.ElementTree(self.to_etree())
         document.write(file, encoding='unicode', xml_declaration=True)
 
 
@@ -60,9 +60,8 @@ class Entry:
         self.categories = []
         self.entries = []
 
-    def _to_etree(self):
+    def to_etree(self):
         element = ET.Element('entry')
-        element.set('xmlns', 'http://www.w3.org/2005/Atom')
         element.append(_ID(self.id))
         element.append(_Title(self.title))
         element.append(_Updated(self.updated))
@@ -71,7 +70,7 @@ class Entry:
         if self.summary:
             element.append(_Summary(self.summary))
         element.extend(
-            item._to_xml()
+            item.to_etree()
             for item in itertools.chain(
                 self.links, self.authors, self.categories, self.entries)
         )
@@ -85,7 +84,7 @@ class _Person:
         self.uri = ''
         self.email = ''
 
-    def _to_etree(self):
+    def to_etree(self):
         element = ET.Element(self._TAG)
         element.append(_Name(self.name))
         if self.uri:
@@ -106,7 +105,7 @@ class Link:
         self.rel = ''
         self.type = ''
 
-    def _to_etree(self):
+    def to_etree(self):
         element = ET.Element('link')
         element.set('href', self.href)
         if self.rel:
@@ -123,7 +122,7 @@ class Category:
         self.scheme = ''
         self.label = ''
 
-    def _to_etree(self):
+    def to_etree(self):
         element = ET.Element('category')
         element.set('term', self.term)
         if self.scheme:
