@@ -40,14 +40,6 @@ class Page:
         with open(dst, 'w') as file:
             file.write(self.content)
 
-    def pipe(self, func):
-        """Pipe the page's content through the function.
-
-        More explicitly, call the given function with page.content and assign
-        its return value to the page.content.
-        """
-        self.content = func(self.content)
-
 
 class BasePageLoader:
     """Page loader.

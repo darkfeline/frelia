@@ -33,9 +33,3 @@ def test_page_publish(tmpdir):
 
     filepath = root.join('blog').join('post')
     assert filepath.read_text('utf-8') == 'foobar'
-
-
-def test_page_pipe():
-    page = page_mod.Page('blog/post', 'foobar')
-    page.pipe(lambda x: x + 'baz')
-    assert page.content == 'foobarbaz'
