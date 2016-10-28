@@ -68,8 +68,9 @@ def _prefix_keys(mapping, prefix):
 
 class JinjaRenderer:
 
-    def __init__(self, env):
+    def __init__(self, env, default_template='base.html'):
         self.env = env
+        self.default_template = default_template
 
     def __repr__(self):
         return '{cls}({env!r})'.format(
@@ -79,32 +80,32 @@ class JinjaRenderer:
         """Render a document as a Jinja template.
 
         This allows the use of Jinja macros in the document.  Compare with
-        jinja_render().
+        render().
 
         This is extremely slow.
         """
         logger.debug('Rendering %r content with %r.', document, self)
         document_as_template = self.env.from_string(document.body)
-        rendered_content = document_as_template.render(document.header)
-        document.body = rendered_content
+        rendered_body = document_as_template.render(document.header)
+        document.body = rendered_body
 
-    def render(self, document, default_template='base.html'):
+    def render(self, document):
         """Render a document using Jinja."""
         logger.debug('Rendering document %r with %r.', document, self)
-        template = self._get_template(document, default_template)
+        template = self._get_template(document)
         context = self._get_context(document)
-        return template.render(context)
+        rendered_body = template.render(context)
+        document.body = rendered_body
 
-    @staticmethod
-    def _get_context(document):
+    def _get_context(self, document):
         """Get the context for rendering the document."""
         context = document.header.copy()
         context['content'] = document.body
         return context
 
-    def _get_template(self, document, default_template):
+    def _get_template(self, document):
         """Get the Jinja template for the document."""
-        template_name = document.header.get('template', default_template)
+        template_name = document.header.get('template', self.default_template)
         return self.env.get_template(template_name)
 
 
