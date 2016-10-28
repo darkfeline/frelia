@@ -11,7 +11,7 @@ An Enja file is a text file that contains:
 - the document body
 """
 
-import functools
+import collections
 import io
 
 import yaml
@@ -19,55 +19,28 @@ import yaml
 _DIVIDER = '---\n'
 
 
-class Document:
-
-    """Document with metadata.
-
-    A document has two slots: header and body.  The header contains a metadata
-    dict, and the body contains a string.  The Document class does not dictate
-    any particular format for the header or the body.
-    """
-
-    def __init__(self, header, body):
-        self.header = header
-        self.body = body
-
-    def __eq__(self, other):
-        if isinstance(other, type(self)):
-            return self.header == other.header and self.body == other.body
-        else:
-            return NotImplemented
+Document = collections.namedtuple('Document', 'header,body')
 
 
-class BaseLoader:
-
-    """Loader for Enja formatted documents."""
-
-    def __init__(self, document_cls):
-        self.document_cls = document_cls
-
-    def __call__(self, file):
-        """Load a document from an Enja file."""
-        header_stream, file = _create_header_stream(file)
-        header = yaml.load(header_stream, Loader=yaml.CLoader)
-        if header is None:
-            header = {}
-        body = file.read()
-        return self.document_cls(header, body)
+def load(file):
+    """Load a document from an Enja file."""
+    header_stream, file = _create_header_stream(file)
+    header = yaml.load(header_stream, Loader=yaml.CLoader)
+    if header is None:
+        header = {}
+    body = file.read()
+    return Document(header, body)
 
 
-Loader = functools.partial(BaseLoader, Document)
-
-
-def dump(doc, file):
+def dump(document, file):
     """Write a document to an enja file."""
     yaml.dump(
-        doc.header,
+        document.header,
         file,
         Dumper=yaml.CDumper,
         default_flow_style=False)
     file.write(_DIVIDER)
-    file.write(doc.body)
+    file.write(document.body)
 
 
 def _create_header_stream(file):
