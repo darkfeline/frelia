@@ -10,7 +10,8 @@ import mir.frelia.enja as enja
 def test_load():
     """Test parsing a simple enja document from a file."""
     file = io.StringIO('foo: bar\n---\n<p>Hello world!</p>')
-    doc = enja.load(file)
+    loader = enja.Loader()
+    doc = loader(file)
     assert doc.header == {'foo': 'bar'}
     assert doc.body == '<p>Hello world!</p>'
 
@@ -18,7 +19,8 @@ def test_load():
 def test_load_empty_file():
     """Test parsing an empty enja document from a file."""
     file = io.StringIO('')
-    doc = enja.load(file)
+    loader = enja.Loader()
+    doc = loader(file)
     assert doc.header == {}
     assert doc.body == ''
 

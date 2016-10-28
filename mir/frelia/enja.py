@@ -11,6 +11,7 @@ An Enja file is a text file that contains:
 - the document body
 """
 
+import functools
 import io
 
 import yaml
@@ -38,7 +39,7 @@ class Document:
             return NotImplemented
 
 
-class Loader:
+class BaseLoader:
 
     """Loader for Enja formatted documents."""
 
@@ -55,7 +56,7 @@ class Loader:
         return self.document_cls(header, body)
 
 
-load = Loader(Document)
+Loader = functools.partial(BaseLoader, Document)
 
 
 def dump(doc, file):
