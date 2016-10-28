@@ -38,7 +38,7 @@ class Document:
             return NotImplemented
 
 
-class BaseLoader:
+class Loader:
 
     """Loader for Enja formatted documents."""
 
@@ -55,7 +55,7 @@ class BaseLoader:
         return self.document_cls(header, body)
 
 
-load = BaseLoader(Document)
+load = Loader(Document)
 
 
 def dump(doc, file):

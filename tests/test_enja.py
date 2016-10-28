@@ -7,28 +7,29 @@ import pytest
 import mir.frelia.enja as enja
 
 
-@pytest.mark.parametrize('text,header,body', [
-    ('foo: bar\n---\n<p>Hello world!</p>',
-     {'foo': 'bar'}, '<p>Hello world!</p>'),
-    ('', {}, ''),
-])
-def test_load(text, header, body):
+def test_load():
     """Test parsing a simple enja document from a file."""
-    file = io.StringIO(text)
+    file = io.StringIO('foo: bar\n---\n<p>Hello world!</p>')
     doc = enja.load(file)
-    assert doc.header == header
-    assert doc.body == body
+    assert doc.header == {'foo': 'bar'}
+    assert doc.body == '<p>Hello world!</p>'
 
 
-@pytest.mark.parametrize('document,text', [
-    (enja.Document({'sophie': 'prachta'}, 'girl meets girl'),
-     'sophie: prachta\n---\ngirl meets girl'),
-])
-def test_dump(document, text):
-    """Test parsing a simple enja document from a file."""
+def test_load_empty_file():
+    """Test parsing an empty enja document from a file."""
+    file = io.StringIO('')
+    doc = enja.load(file)
+    assert doc.header == {}
+    assert doc.body == ''
+
+
+def test_dump():
+    """Test dumping an Enja document to a file."""
+    document = enja.Document(header={'sophie': 'prachta'},
+                             body='girl meets girl')
     file = io.StringIO()
     enja.dump(document, file)
-    assert file.getvalue() == text
+    assert file.getvalue() == 'sophie: prachta\n---\ngirl meets girl'
 
 
 def test_document_equal():
