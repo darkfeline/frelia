@@ -22,25 +22,22 @@ _DIVIDER = '---\n'
 Document = collections.namedtuple('Document', 'header,body')
 
 
-def load(file):
-    """Load a document from an Enja file."""
-    header_stream, file = _create_header_stream(file)
-    header = yaml.load(header_stream, Loader=yaml.CLoader)
-    if header is None:
-        header = {}
-    body = file.read()
-    return Document(header, body)
-
-
 def dump(document, file):
     """Write a document to an enja file."""
     yaml.dump(
-        document.header,
-        file,
+        document.header, file,
         Dumper=yaml.CDumper,
         default_flow_style=False)
     file.write(_DIVIDER)
     file.write(document.body)
+
+
+def load(file):
+    """Load a document from an Enja file."""
+    header_stream, file = _create_header_stream(file)
+    header = _load_header(header_stream)
+    body = file.read()
+    return Document(header, body)
 
 
 def _create_header_stream(file):
@@ -59,3 +56,11 @@ def _create_header_stream(file):
             header_stream.write(line)
     header_stream.seek(0)
     return header_stream, file
+
+
+def _load_header(stream):
+    header = yaml.load(stream, Loader=yaml.CLoader)
+    if header is None:
+        return {}
+    else:
+        return header
