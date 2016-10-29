@@ -11,80 +11,70 @@ An Enja file is a text file that contains:
 - the document body
 """
 
-import abc
 import io
 
 import yaml
 
 
-class Document(abc.ABC):
-
-    """Document interface.
-
-    Classes should expose the following attributes:
-        header: A mutable mapping.
-        body: A string.
-    """
-
-    @classmethod
-    @abc.abstractmethod
-    def load(cls, file):
-        """Load a document from `file`."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def dump(self, file):
-        """Write the document to `file`."""
-        raise NotImplementedError
-
-
-class EnjaDocument(Document):
-
-    _DIVIDER = '---\n'
+class Document:
 
     def __init__(self, body: str):
         self.header = {}
         self.body = body
 
-    @classmethod
-    def load(cls, file):
+
+def dump(document, file):
+    """Write a document to an enja file."""
+    yaml.dump(
+        document.header, file,
+        Dumper=yaml.CDumper,
+        default_flow_style=False)
+    file.write(_DIVIDER)
+    file.write(document.body)
+
+
+class Loader:
+
+    def __init__(self, document_class):
+        self._document_class = document_class
+
+    def __call__(self, file):
         """Load a document from an Enja file."""
-        header_stream, file = cls._create_header_stream(file)
-        header = cls._load_header(header_stream)
+        header_stream, file = _create_header_stream(file)
+        header = _load_header(header_stream)
         body = file.read()
-        return Document(header, body)
+        document = self._document_class(body)
+        document.header = header
+        return document
 
-    def dump(self, file):
-        """Write a document to an enja file."""
-        yaml.dump(
-            self.header, file,
-            Dumper=yaml.CDumper,
-            default_flow_style=False)
-        file.write(self._DIVIDER)
-        file.write(self.body)
 
-    @classmethod
-    def _create_header_stream(cls, file):
-        """Create metadata stream from a file object.
+load = Loader(Document)
 
-        Read off the header section from a file object and return that stream
-        along with the file object, whose position will be at the start of the
-        document body.
-        """
-        assert isinstance(file, io.TextIOBase)
-        header_stream = io.StringIO()
-        for line in file:
-            if line == cls._DIVIDER:
-                break
-            else:
-                header_stream.write(line)
-        header_stream.seek(0)
-        return header_stream, file
 
-    @staticmethod
-    def _load_header(stream):
-        header = yaml.load(stream, Loader=yaml.CLoader)
-        if header is None:
-            return {}
+_DIVIDER = '---\n'
+
+
+def _create_header_stream(file):
+    """Create metadata stream from a file object.
+
+    Read off the header section from a file object and return that stream
+    along with the file object, whose position will be at the start of the
+    document body.
+    """
+    assert isinstance(file, io.TextIOBase)
+    header_stream = io.StringIO()
+    for line in file:
+        if line == _DIVIDER:
+            break
         else:
-            return header
+            header_stream.write(line)
+    header_stream.seek(0)
+    return header_stream, file
+
+
+def _load_header(stream):
+    header = yaml.load(stream, Loader=yaml.CLoader)
+    if header is None:
+        return {}
+    else:
+        return header

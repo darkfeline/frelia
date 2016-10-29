@@ -16,13 +16,13 @@ class _RecursiveLoader:
 
 class _PageLoader:
 
-    def __init__(self, page_class, document_class):
+    def __init__(self, page_class, document_loader):
         self._page_class = page_class
-        self._document_class = document_class
+        self._document_loader = document_loader
 
     def __call__(self, filepath):
         with open(filepath) as file:
-            document = self._document_class.load(file)
+            document = self._document_loader(file)
         page = self._page_class.from_document(filepath, document)
         return page
 
@@ -67,4 +67,4 @@ class BasicPage(Page):
         }
 
 
-load_pages = _RecursiveLoader(_PageLoader(BasicPage, enja.Document))
+load_pages = _RecursiveLoader(_PageLoader(BasicPage, enja.load))
