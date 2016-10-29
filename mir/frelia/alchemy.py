@@ -49,8 +49,7 @@ def flatten_mapping(mapping, separator='_', prefix=''):
     True
     """
     new_mapping = _prefix_keys(mapping, prefix)
-    nested_mappings = ((key, value) for key, value in mapping.items()
-                       if isinstance(value, Mapping))
+    nested_mappings = _nested_mappings(mapping)
     for key, mapping in nested_mappings:
         new_items = flatten_mapping(
             mapping=mapping,
@@ -64,6 +63,11 @@ def flatten_mapping(mapping, separator='_', prefix=''):
 def _prefix_keys(mapping, prefix):
     """Prepend a prefix to all keys in a mapping."""
     return {prefix + key: value for key, value in mapping.items()}
+
+
+def _nested_mappings(mapping):
+    return ((key, value) for key, value in mapping.items()
+            if isinstance(value, Mapping))
 
 
 class JinjaRenderer:
