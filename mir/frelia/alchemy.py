@@ -22,6 +22,7 @@ import datetime
 import itertools
 import logging
 import os
+import pathlib
 import string
 
 import mir.frelia.fs
@@ -113,38 +114,31 @@ class JinjaRenderer:
         return self.env.get_template(template_name)
 
 
-class SetDateFromPath:
-
-    """Set pages' date header from page path.
-
-    Attempt to set the given header field, if missing, to a date parsed from
-    the page path.
-    """
-
-    def __init__(self, fieldname):
-        self.fieldname = fieldname
-
-    def __repr__(self):
-        return '{cls}({this.fieldname!r})'.format(
-            cls=type(self).__qualname__,
-            this=self)
-
-    def __call__(self, pages):
-        fieldname = self.fieldname
-        parse_date = _parse_date_from_path
-        for page in pages:
-            metadata = page.content.header
-            if fieldname not in metadata:
-                try:
-                    metadata[fieldname] = parse_date(page.path)
-                except ValueError:
-                    logger.exception('Could not parse date for %r', page)
-            yield page
-
-
-def _parse_date_from_path(path):
+def parse_date_from_path(path):
     """Parse a date using the final filenames in a path."""
-    path = os.path.dirname(path)
-    filenames = mir.frelia.fs.split_filenames(path)
-    day, month, year = tuple(itertools.islice(filenames, 3))
-    return datetime.date(int(year), int(month), int(day))
+    path = pathlib.Path(path)
+    for year, month, day in _iter_candidate_parts(path):
+        try:
+            return datetime.date(int(year), int(month), int(day))
+        except ValueError:
+            continue
+    else:
+        raise ValueError("%r doesn't contain date" % path)
+
+
+def _iter_candidate_parts(path):
+    """Generate candidate date parts from path.
+
+            blog/2016/01/02/posts
+    yields:           y   m   d
+    yields:       y   m   d
+    yields:  y    m   d
+    """
+    path = pathlib.Path(path)
+    if len(path.parts) < 3:
+        return
+    reversed_parts = reversed(path.parts)
+    yield from zip(
+        reversed_parts[2:],
+        reversed_parts[1:],
+        reversed_parts)
