@@ -113,53 +113,6 @@ class JinjaRenderer:
         return self.env.get_template(template_name)
 
 
-class CopyMetadata:
-
-    """Set a missing document metadata field with another metadata field."""
-
-    def __init__(self, from_field, to_field):
-        self.from_field = from_field
-        self.to_field = to_field
-
-    def __repr__(self):
-        return ('{cls}(from_field={this.from_field!r},'
-                ' to_field={this.to_field!r})'
-                .format(
-                    cls=type(self).__qualname__,
-                    this=self))
-
-    def __call__(self, documents):
-        from_field = self.from_field
-        to_field = self.to_field
-        for document in documents:
-            header = document.header
-            if to_field not in header and from_field in header:
-                header[to_field] = header[from_field]
-            yield document
-
-
-class SetDefaultMetadata:
-
-    """Set default values for missing document metadata."""
-
-    def __init__(self, defaults):
-        assert isinstance(defaults, dict)
-        self.defaults = defaults
-
-    def __repr__(self):
-        return '{cls}({this.defaults!r})'.format(
-            cls=type(self).__qualname__,
-            this=self)
-
-    def __call__(self, documents):
-        make_copy = self.defaults.copy
-        for document in documents:
-            new_header = make_copy()
-            new_header.update(document.header)
-            document.header = new_header
-            yield document
-
-
 class SetDateFromPath:
 
     """Set pages' date header from page path.
