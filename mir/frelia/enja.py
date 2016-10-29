@@ -11,12 +11,34 @@ An Enja file is a text file that contains:
 - the document body
 """
 
+import abc
 import io
 
 import yaml
 
 
-class Document:
+class Document(abc.ABC):
+
+    """Document interface.
+
+    Classes should expose the following attributes:
+        header: A mutable mapping.
+        body: A string.
+    """
+
+    @classmethod
+    @abc.abstractmethod
+    def load(cls, file):
+        """Load a document from `file`."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def dump(self, file):
+        """Write the document to `file`."""
+        raise NotImplementedError
+
+
+class EnjaDocument(Document):
 
     _DIVIDER = '---\n'
 
