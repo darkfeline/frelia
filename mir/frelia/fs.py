@@ -11,25 +11,22 @@ def find_files(path):
             yield os.path.join(dirpath, filename)
 
 
-def link_files(src, dst):
+def link_recursively(src_dir, dst_dir):
     """Hard link files recursively from src to dst."""
-    for src_path in find_files(src):
-        rel_path = os.path.relpath(src_path, src)
-        dst_path = os.path.join(dst, rel_path)
-        os.makedirs(os.path.dirname(dst_path), exist_ok=True)
-        os.link(src_path, dst_path)
+    for filepath in find_files(src_dir):
+        rel_filepath = os.path.relpath(filepath, src_dir)
+        dst_filepath = os.path.join(dst_dir, rel_filepath)
+        link_parents(filepath, dst_filepath)
 
 
-def split_filenames(path):
-    """Yield filename components of a path.
+def link_parents(src, dst):
+    """Link src to dst, creating  parent directories."""
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    os.link(src, dst)
 
-    >>> list(split_filenames('/foo/bar/baz'))
-    ['baz', 'bar', 'foo', '/']
-    """
-    while path:
-        path, filename = os.path.split(path)
-        if filename:
-            yield filename
-        else:
-            yield path
-            break
+
+def write_parents(path, string):
+    """Write string to file at path, creating parent directories."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w') as file:
+        file.write(string)
