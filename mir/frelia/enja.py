@@ -32,6 +32,15 @@ class Document:
         body = file.read()
         return Document(header, body)
 
+    def dump(self, file):
+        """Write a document to an enja file."""
+        yaml.dump(
+            self.header, file,
+            Dumper=yaml.CDumper,
+            default_flow_style=False)
+        file.write(self._DIVIDER)
+        file.write(self.body)
+
     @classmethod
     def _create_header_stream(cls, file):
         """Create metadata stream from a file object.
@@ -57,12 +66,3 @@ class Document:
             return {}
         else:
             return header
-
-    def dump(self, file):
-        """Write a document to an enja file."""
-        yaml.dump(
-            self.header, file,
-            Dumper=yaml.CDumper,
-            default_flow_style=False)
-        file.write(self._DIVIDER)
-        file.write(self.body)
