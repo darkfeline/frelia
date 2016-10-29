@@ -11,56 +11,58 @@ An Enja file is a text file that contains:
 - the document body
 """
 
-import collections
 import io
 
 import yaml
 
-_DIVIDER = '---\n'
 
+class Document:
 
-Document = collections.namedtuple('Document', 'header,body')
+    _DIVIDER = '---\n'
 
+    def __init__(self, body: str):
+        self.header = {}
+        self.body = body
 
-def dump(document, file):
-    """Write a document to an enja file."""
-    yaml.dump(
-        document.header, file,
-        Dumper=yaml.CDumper,
-        default_flow_style=False)
-    file.write(_DIVIDER)
-    file.write(document.body)
+    @classmethod
+    def load(cls, file):
+        """Load a document from an Enja file."""
+        header_stream, file = cls._create_header_stream(file)
+        header = cls._load_header(header_stream)
+        body = file.read()
+        return Document(header, body)
 
+    @classmethod
+    def _create_header_stream(cls, file):
+        """Create metadata stream from a file object.
 
-def load(file):
-    """Load a document from an Enja file."""
-    header_stream, file = _create_header_stream(file)
-    header = _load_header(header_stream)
-    body = file.read()
-    return Document(header, body)
+        Read off the header section from a file object and return that stream
+        along with the file object, whose position will be at the start of the
+        document body.
+        """
+        assert isinstance(file, io.TextIOBase)
+        header_stream = io.StringIO()
+        for line in file:
+            if line == cls._DIVIDER:
+                break
+            else:
+                header_stream.write(line)
+        header_stream.seek(0)
+        return header_stream, file
 
-
-def _create_header_stream(file):
-    """Create metadata stream from a file object.
-
-    Read off the header section from a file object and return that stream along
-    with the file object, whose position will be at the start of the document
-    body.
-    """
-    assert isinstance(file, io.TextIOBase)
-    header_stream = io.StringIO()
-    for line in file:
-        if line == _DIVIDER:
-            break
+    @staticmethod
+    def _load_header(stream):
+        header = yaml.load(stream, Loader=yaml.CLoader)
+        if header is None:
+            return {}
         else:
-            header_stream.write(line)
-    header_stream.seek(0)
-    return header_stream, file
+            return header
 
-
-def _load_header(stream):
-    header = yaml.load(stream, Loader=yaml.CLoader)
-    if header is None:
-        return {}
-    else:
-        return header
+    def dump(self, file):
+        """Write a document to an enja file."""
+        yaml.dump(
+            self.header, file,
+            Dumper=yaml.CDumper,
+            default_flow_style=False)
+        file.write(self._DIVIDER)
+        file.write(self.body)
