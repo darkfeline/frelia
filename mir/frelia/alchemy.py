@@ -17,32 +17,29 @@ Transmutations should:
 - may or may not mutate the objects in place.
 """
 
+import collections
 from collections.abc import Mapping
 import datetime
-import itertools
 import logging
-import os
 import pathlib
 import string
-
-import mir.frelia.fs
 
 logger = logging.getLogger(__name__)
 
 
-def render_template(document, mapping):
+def render(page, base_mapping):
     """Render documents using Python templates.
 
     Python templates provide the fastest possible templating in Python and are
     significantly faster than Jinja templates.
     """
-    mapping = mapping.copy()
-    mapping.update(document.header)
-    template = string.Template(document.body)
-    document.body = template.safe_substitute(mapping)
+    mapping = collections.ChainMap(page.metadata, base_mapping)
+    flat_mapping = _flatten_mapping(mapping)
+    template = string.Template(page.content)
+    return template.safe_substitute(flat_mapping)
 
 
-def flatten_mapping(mapping, separator='_', prefix=''):
+def _flatten_mapping(mapping, separator='_', prefix=''):
     """Flatten nested mappings.
 
     >>> got = flatten_mapping({'foo': {'bar': 'baz'}})
@@ -52,7 +49,7 @@ def flatten_mapping(mapping, separator='_', prefix=''):
     new_mapping = _prefix_keys(mapping, prefix)
     nested_mappings = _nested_mappings(mapping)
     for key, mapping in nested_mappings:
-        new_items = flatten_mapping(
+        new_items = _flatten_mapping(
             mapping=mapping,
             separator=separator,
             prefix=prefix + key + separator)
@@ -74,12 +71,14 @@ def _nested_mappings(mapping):
 class JinjaRenderer:
 
     def __init__(self, env, default_template='base.html'):
-        self.env = env
-        self.default_template = default_template
+        self._env = env
+        self._default_template = default_template
 
     def __repr__(self):
-        return '{cls}({env!r})'.format(
-            cls=type(self).__qualname__, env=self.env)
+        return ('{cls}(env={env!r}, default_template={default_template!r})'
+                .format(cls=type(self).__qualname__,
+                        env=self._env,
+                        default_template=self._default_template))
 
     def render_as_template(self, document):
         """Render a document as a Jinja template.
@@ -89,29 +88,38 @@ class JinjaRenderer:
 
         This is extremely slow.
         """
-        logger.debug('Rendering %r content with %r.', document, self)
-        document_as_template = self.env.from_string(document.body)
-        rendered_body = document_as_template.render(document.header)
-        document.body = rendered_body
+        logger.debug('Rendering %r as template with %r.', document, self)
+        document_as_template = self.env.from_string(document.content)
+        context = self._get_context(document)
+        return document_as_template.render(context)
 
     def render(self, document):
         """Render a document using Jinja."""
-        logger.debug('Rendering document %r with %r.', document, self)
+        logger.debug('Rendering %r with %r.', document, self)
         template = self._get_template(document)
-        context = self._get_context(document)
-        rendered_body = template.render(context)
-        document.body = rendered_body
+        context = self._get_context_with_content(document)
+        return template.render(context)
 
     def _get_context(self, document):
         """Get the context for rendering the document."""
-        context = document.header.copy()
-        context['content'] = document.body
+        context = collections.ChainMap({}, document.metadata)
+        return context
+
+    def _get_context_with_content(self, document):
+        context = self._get_context(document)
+        context['content'] = document.content
         return context
 
     def _get_template(self, document):
         """Get the Jinja template for the document."""
-        template_name = document.header.get('template', self.default_template)
-        return self.env.get_template(template_name)
+        template_name = document.template
+        return self._env.get_template(template_name)
+
+    def _get_template_name(self, document):
+        try:
+            return document.template
+        except AttributeError:
+            return self._default_template
 
 
 def parse_date_from_path(path):
