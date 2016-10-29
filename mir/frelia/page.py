@@ -1,3 +1,5 @@
+import abc
+
 import mir.frelia.fs as fslib
 import mir.frelia.enja as enja
 
@@ -25,7 +27,29 @@ class _PageLoader:
         return page
 
 
-class Page:
+class Page(abc.ABC):
+
+    """Page interface.
+
+    Classes should provide the following attributes:
+        metadata: A mapping of the page's metadata.
+        content: The page's content as a string.
+
+    The metadata attribute does not have to be settable, but if it is settable,
+    setting it should mutate the page accordingly.
+
+    The mapping obtained from the metadata attribute should not be mutated, so
+    that classes may implement the metadata attribute freely.
+    """
+
+    @classmethod
+    @abc.abstractmethod
+    def from_document(cls, path, document):
+        """Create a page instance from a document."""
+        raise NotImplementedError
+
+
+class BasicPage(Page):
 
     def __init__(self, path, content):
         self.path = path
@@ -36,5 +60,11 @@ class Page:
         page = cls(path, document.body)
         return page
 
+    @property
+    def metadata(self):
+        return {
+            'path': self.path,
+        }
 
-load_pages = _RecursiveLoader(_PageLoader(Page, enja.Document))
+
+load_pages = _RecursiveLoader(_PageLoader(BasicPage, enja.Document))
