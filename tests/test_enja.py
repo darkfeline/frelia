@@ -30,3 +30,43 @@ def test_dump():
     file = io.StringIO()
     enja.dump(document, file)
     assert file.getvalue() == 'sophie: prachta\n---\ngirl meets girl'
+
+
+def test_document_equal():
+    """Test document equality."""
+    doc1 = enja.Document('girl meets girl')
+    doc1.header['sophie'] = 'prachta'
+    doc2 = enja.Document('girl meets girl')
+    doc2.header['sophie'] = 'prachta'
+    assert doc1 == doc2
+
+
+def test_document_unequal_body():
+    """Test document with unequal body."""
+    doc1 = enja.Document('girl meets girl')
+    doc1.header['sophie'] = 'prachta'
+    doc2 = enja.Document('')
+    doc2.header['sophie'] = 'prachta'
+    assert doc1 != doc2
+
+
+def test_document_unequal_header():
+    """Test document with unequal header."""
+    doc1 = enja.Document('girl meets girl')
+    doc1.header['sophie'] = 'prachta'
+    doc2 = enja.Document('girl meets girl')
+    assert doc1 != doc2
+
+
+def test_document_unequal_type():
+    """Test document against unequal type."""
+    doc = enja.Document('girl meets girl')
+    doc.header['sophie'] = 'prachta'
+    assert doc != 'girl meets girl'
+
+
+def test_document_repr():
+    """Test document repr()."""
+    doc = enja.Document('girl meets girl')
+    doc.header['sophie'] = 'prachta'
+    assert repr(doc) == "<Document with header={'sophie': 'prachta'}, body='girl meets girl'>"

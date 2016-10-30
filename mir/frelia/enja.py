@@ -24,6 +24,19 @@ class Document:
         self.header = {}
         self.body = body
 
+    def __repr__(self):
+        return '<{cls} with header={header!r}, body={body!r}>'.format(
+            cls=type(self).__qualname__,
+            header=self.header,
+            body=self.body,
+        )
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return (self.header == other.header and self.body == other.body)
+        else:
+            return NotImplemented
+
 
 def dump(document, file):
     """Write a document to an enja file."""
