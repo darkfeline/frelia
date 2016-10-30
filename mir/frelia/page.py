@@ -41,9 +41,18 @@ class Page(abc.ABC):
 
     The mapping obtained from the metadata attribute should not be mutated, so
     that classes may implement the metadata attribute freely.
+
+    The metadata and content attributes together should fully describe an
+    instance, so that two instances with equal metadata and content should
+    compare equal.
     """
 
     __slots__ = ()
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return (self.metadata == other.metadata
+                    and self.content == other.content)
 
     @classmethod
     @abc.abstractmethod

@@ -19,4 +19,4 @@ def test_basic_page_metadata():
 def test_load_pages(tmpdir):
     (tmpdir / 'file').write_text('sophie: prachta\n---\nfiris')
     got = list(pagelib.load_pages(tmpdir))
-    assert got == []
+    assert got == [pagelib.BasicPage()]
