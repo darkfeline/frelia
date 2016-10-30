@@ -13,6 +13,8 @@ class URL:
 
     """Sitemap URL."""
 
+    __slots__ = ('loc', '_lastmod', '_changefreq', '_priority')
+
     def __init__(self, loc):
         self.loc = loc
         self.lastmod = None

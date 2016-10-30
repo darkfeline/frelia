@@ -42,6 +42,8 @@ class Page(abc.ABC):
     that classes may implement the metadata attribute freely.
     """
 
+    __slots__ = ()
+
     @classmethod
     @abc.abstractmethod
     def from_document(cls, path, document):

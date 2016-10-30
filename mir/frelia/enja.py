@@ -18,6 +18,8 @@ import yaml
 
 class Document:
 
+    __slots__ = ('header', 'body')
+
     def __init__(self, body: str):
         self.header = {}
         self.body = body
