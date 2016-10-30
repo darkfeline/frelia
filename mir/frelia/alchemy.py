@@ -42,7 +42,7 @@ def render(page, base_mapping):
 def _flatten_mapping(mapping, separator='_', prefix=''):
     """Flatten nested mappings.
 
-    >>> got = flatten_mapping({'foo': {'bar': 'baz'}})
+    >>> got = _flatten_mapping({'foo': {'bar': 'baz'}})
     >>> got == {'foo_bar': 'baz'}
     True
     """

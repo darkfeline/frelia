@@ -1,10 +1,15 @@
 import functools
+import pathlib
 from unittest import mock
 
 import jinja2
 import pytest
 
-# pylint: disable=redefined-outer-name
+
+@pytest.fixture
+def tmpdir(tmpdir_factory):
+    tmpdir = tmpdir_factory.mktemp('tmpdir')
+    return pathlib.Path(str(tmpdir))
 
 
 @pytest.fixture

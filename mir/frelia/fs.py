@@ -6,6 +6,7 @@ import pathlib
 
 def find_files(path):
     """Yield the paths of all files in a directory tree."""
+    path = str(path)  # TODO Python 3.5 doesn’t support __fspath__
     for dirpath, dirnames, filenames in os.walk(path):
         dirpath = pathlib.Path(dirpath)
         for filename in filenames:
@@ -19,7 +20,7 @@ def link_recursively(src_dir, dst_dir):
         rel_filepath = filepath.relative_to(src_dir)
         dst_filepath = dst_dir / rel_filepath
         make_parents(dst_filepath)
-        os.link(filepath, dst_filepath)
+        os.link(str(filepath), str(dst_filepath))  # TODO Python 3.5 doesn’t support __fspath__
 
 
 def make_parents(path):
