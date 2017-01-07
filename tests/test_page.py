@@ -1,8 +1,6 @@
 import mir.frelia.enja as enja
 import mir.frelia.page as pagelib
 
-import pytest
-
 
 def test_basic_page_from_document():
     document = enja.Document('Was yea ra chs hymmnos mea')
@@ -20,5 +18,5 @@ def test_load_pages(tmpdir):
     (tmpdir / 'file').write_text('sophie: prachta\n---\nfiris')
     got = list(pagelib.load_pages(tmpdir))
     assert len(got) == 1
-    assert got[0].path == str(tmpdir/'file')
+    assert got[0].path == tmpdir/'file'
     assert got[0].content == 'firis'
