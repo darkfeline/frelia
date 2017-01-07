@@ -21,7 +21,6 @@ class _PageLoader:
         self._document_loader = document_loader
 
     def __call__(self, filepath):
-        filepath = str(filepath)  # TODO Python 3.5 doesn’t support __fspath__
         with open(filepath) as file:
             document = self._document_loader(file)
         page = self._page_class.from_document(filepath, document)
